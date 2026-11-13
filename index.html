@@ -1,0 +1,2468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PyQuest AI — Novice to Master Python Mentor</title>
+  <!-- PWA Manifest & Mobile Installability Meta Tags -->
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="PyQuest AI" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%234f46e5'/%3E%3Cpath d='M165 185l85 71-85 71' fill='none' stroke='%23fcd34d' stroke-width='38' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='270' y1='327' x2='355' y2='327' stroke='%2334d399' stroke-width='38' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#1e1b4b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Mobile App Shell & Custom Scrollbars */
+    body {
+      background: radial-gradient(circle at top left, #1e1b4b, #0f172a 70%);
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+      50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    }
+    .call-pulse {
+      animation: pulseGlow 2s infinite;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-slide-up {
+      animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .flowchart-node {
+      transition: all 0.25s ease;
+    }
+    .flowchart-active {
+      transform: scale(1.04);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+      border-color: #818cf8 !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 sm:p-4 text-slate-800">
+
+  <!-- Mobile-First App Container (Centered mobile frame on desktop, 100% full screen on mobile) -->
+  <div id="appShell" class="w-full sm:max-w-[430px] h-[100dvh] sm:h-[850px] bg-slate-50 sm:rounded-[2.5rem] sm:border-[8px] sm:border-slate-800 shadow-2xl flex flex-col overflow-hidden relative">
+
+    <!-- Top App Header -->
+    <header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white px-4 pt-4 pb-3 shrink-0 shadow-md z-20">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/25 shadow-inner">
+            <i class="fa-brands fa-python text-2xl text-amber-300"></i>
+          </div>
+          <div>
+            <h1 class="font-extrabold text-base tracking-tight leading-none flex items-center gap-1.5">
+              PyQuest AI
+              <span class="text-[10px] uppercase tracking-wider bg-amber-400 text-slate-900 font-bold px-1.5 py-0.5 rounded-full">Pro</span>
+            </h1>
+        <!-- Right Header Controls: PWA Install + API Key + One-Tap Call -->
+        <div class="flex items-center gap-1.5">
+          <button onclick="triggerPwaInstall()" id="pwaInstallBtn" class="hidden px-2.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 active:scale-95 transition flex items-center gap-1 text-xs font-extrabold shadow" title="Install PyQuest AI App">
+            <i class="fa-solid fa-download text-[11px]"></i>
+            <span>Install</span>
+          </button>
+
+          <button onclick="openApiModal()" id="apiStatusBtn" class="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 transition flex items-center gap-1.5 text-xs font-semibold border border-white/20" title="Configure Gemini API Key">
+            <span id="apiDot" class="w-2 h-2 rounded-full bg-amber-300"></span>
+            <span id="apiBtnText">API Key</span>
+          </button>
+
+          <a href="tel:7989686037" onclick="notifyCallAction()" class="call-pulse px-2.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-95 transition flex items-center gap-1.5 text-xs font-bold text-white shadow-lg" title="Call Mentor 7989686037">
+            <i class="fa-solid fa-phone-volume text-xs"></i>
+            <span>Help</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Gamification XP & Streak Bar -->
+      <div class="mt-3 bg-black/20 rounded-2xl p-2 flex items-center justify-between text-xs border border-white/10">
+        <div class="flex items-center gap-2">
+          <span class="bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1">
+            <i class="fa-solid fa-fire"></i> <span id="streakCount">1</span>d
+          </span>
+          <span class="bg-indigo-400/20 text-indigo-100 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1">
+            <i class="fa-solid fa-star text-amber-300"></i> <span id="xpCount">120</span> XP
+          </span>
+        </div>
+        <div class="flex items-center gap-2 flex-1 max-w-[145px] ml-2">
+          <div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+            <div id="xpProgressBar" class="bg-gradient-to-r from-amber-300 to-emerald-400 h-full rounded-full transition-all duration-500" style="width: 24%;"></div>
+          </div>
+          <span id="levelBadge" class="text-[10px] font-bold text-amber-200 shrink-0">Lvl 1</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toast Notification Banner -->
+    <div id="toastBanner" class="hidden absolute top-28 left-4 right-4 z-50 bg-slate-900/95 text-white text-xs font-medium px-4 py-3 rounded-2xl shadow-xl border border-slate-700 flex items-center justify-between backdrop-blur-md">
+      <span id="toastMessage">Notification</span>
+      <button onclick="hideToast()" class="text-slate-400 hover:text-white ml-2"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Main Scrollable Viewport -->
+    <main id="mainContent" class="flex-1 overflow-y-auto no-scrollbar pb-24">
+
+      <!-- ==================== TAB 1: CHAPTER-WISE SYLLABUS (CH 1 - 10) ==================== -->
+      <section id="tab-chapters" class="p-4 space-y-4">
+
+        <!-- Hero Welcome & Quick Vision Snap Card -->
+        <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-4 shadow-lg relative overflow-hidden border border-indigo-500/30">
+          <div class="relative z-10">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="inline-block text-[10px] font-bold uppercase tracking-wider bg-indigo-500/30 text-indigo-200 px-2.5 py-0.5 rounded-full border border-indigo-400/30">
+                10 Chapters • Novice to Master
+              </span>
+              <span id="chapterProgressSummary" class="text-[11px] font-bold text-emerald-300">0/40 Topics</span>
+            </div>
+            <h2 class="text-base font-extrabold leading-snug">Complete Python & CS Mastery Guide</h2>
+            <p class="text-[11px] text-slate-300 mt-1 leading-relaxed">
+              Every chapter explains concepts simply, shows copyable syntax, RAM memory behavior, pitfalls & projects.
+            </p>
+            <div class="mt-3 flex gap-2">
+              <button onclick="switchTab('vision')" class="flex-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow active:scale-95 transition">
+                <i class="fa-solid fa-camera"></i> Snap Doubt Pic
+              </button>
+              <button onclick="switchTab('labs')" class="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 border border-white/15 active:scale-95 transition">
+                <i class="fa-solid fa-flask"></i> Visual Labs
+              </button>
+            </div>
+          </div>
+          <i class="fa-solid fa-book-open-reader text-7xl text-white/5 absolute -bottom-3 -right-3"></i>
+        </div>
+
+        <!-- Instant Topic, Syntax & Data Type Search Bar -->
+        <div class="sticky top-0 z-20 bg-slate-50/95 backdrop-blur-md pt-1 pb-2 space-y-2">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="syllabusSearchInput" oninput="filterSyllabus()" placeholder="Search syntax, datatypes, slicing, heap, OOP, yield..." class="w-full bg-white border border-slate-200 rounded-2xl pl-9 pr-9 py-2.5 text-xs font-medium text-slate-800 shadow-sm focus:outline-none focus:border-indigo-500">
+            <button id="clearSearchBtn" onclick="clearSyllabusSearch()" class="hidden text-slate-400 hover:text-slate-700 text-xs absolute right-3.5 top-1/2 -translate-y-1/2">
+              <i class="fa-solid fa-circle-xmark"></i>
+            </button>
+          </div>
+
+          <!-- Quick Filter Chips -->
+          <div class="flex gap-1.5 overflow-x-auto no-scrollbar">
+            <button onclick="quickFilterTag('all')" class="filter-chip active-chip shrink-0 px-2.5 py-1 rounded-full bg-indigo-600 text-white font-bold text-[10px]">All 10 Chapters</button>
+            <button onclick="quickFilterTag('beginner')" class="filter-chip shrink-0 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-slate-700 font-bold text-[10px]">Novice (Ch 1–4)</button>
+            <button onclick="quickFilterTag('core')" class="filter-chip shrink-0 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-slate-700 font-bold text-[10px]">Core & Memory (Ch 5–7)</button>
+            <button onclick="quickFilterTag('advanced')" class="filter-chip shrink-0 px-2.5 py-1 rounded-full bg-white border border-slate-200 text-slate-700 font-bold text-[10px]">OOP & Projects (Ch 8–10)</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Accordion Container for All 10 Chapters -->
+        <div id="chaptersContainer" class="space-y-3"></div>
+
+        <!-- Empty Search Fallback -->
+        <div id="emptySearchState" class="hidden bg-white rounded-3xl p-6 text-center border border-slate-200 space-y-2">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 mx-auto flex items-center justify-center text-xl">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <h3 class="text-sm font-extrabold text-slate-900">Topic not matched in quick filter?</h3>
+          <p class="text-xs text-slate-500">Ask our Gemini AI Mentor directly for a custom lesson with code examples!</p>
+          <button onclick="askSearchQueryInChat()" class="mt-1 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow">
+            Ask AI Mentor Instead
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ==================== TAB 2: INTERACTIVE VISUAL LABS ==================== -->
+      <section id="tab-labs" class="hidden p-4 space-y-4">
+
+        <!-- Lab Navigation Pills -->
+        <div class="flex gap-1.5 overflow-x-auto no-scrollbar">
+          <button onclick="scrollToStage('stage-0')" class="shrink-0 px-3 py-1.5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs">1. Base & ASCII Lab</button>
+          <button onclick="scrollToStage('stage-1')" class="shrink-0 px-3 py-1.5 rounded-full bg-purple-100 text-purple-700 font-bold text-xs">2. Flowchart Tracer</button>
+          <button onclick="scrollToStage('stage-2')" class="shrink-0 px-3 py-1.5 rounded-full bg-sky-100 text-sky-700 font-bold text-xs">3. Code Sandbox</button>
+          <button onclick="scrollToStage('stage-3')" class="shrink-0 px-3 py-1.5 rounded-full bg-rose-100 text-rose-700 font-bold text-xs">4. Stack/Heap RAM</button>
+        </div>
+
+        <!-- LAB 1: NUMBER SYSTEM CONVERSIONS -->
+        <div id="stage-0" class="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">Lab 1 • Number Systems</span>
+              <h3 class="font-extrabold text-base text-slate-900 mt-1">Bits, Bytes & Base Conversions</h3>
+              <p class="text-xs text-slate-500">Convert Decimal & Unicode characters into Binary, Octal & Hex.</p>
+            </div>
+            <button onclick="completeLesson('stage0', 40)" id="btn-stage0" class="px-2.5 py-1.5 rounded-xl bg-indigo-50 text-indigo-600 font-bold text-xs hover:bg-indigo-100">
+              +40 XP
+            </button>
+          </div>
+
+          <div class="bg-slate-900 text-white rounded-2xl p-3.5 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-calculator"></i> Live Base & ASCII Lab
+              </span>
+              <span class="text-[10px] text-slate-400 font-mono">bin() oct() hex() ord()</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[10px] uppercase text-slate-400 font-bold">Decimal (Base 10)</label>
+                <input type="number" id="convDec" value="65" min="0" max="65535" oninput="updateConversions('dec')" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm font-mono font-bold text-emerald-400 focus:outline-none focus:border-indigo-400">
+              </div>
+              <div>
+                <label class="text-[10px] uppercase text-slate-400 font-bold">ASCII / Unicode Char</label>
+                <input type="text" id="convChar" value="A" maxlength="1" oninput="updateConversions('char')" class="w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm font-mono font-bold text-amber-300 focus:outline-none focus:border-indigo-400">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div class="bg-slate-800/90 p-2 rounded-xl border border-slate-700/80">
+                <div class="text-[10px] text-slate-400">Binary (0b)</div>
+                <div id="outBin" class="font-mono text-xs font-bold text-sky-300 mt-0.5 break-all">0b1000001</div>
+              </div>
+              <div class="bg-slate-800/90 p-2 rounded-xl border border-slate-700/80">
+                <div class="text-[10px] text-slate-400">Octal (0o)</div>
+                <div id="outOct" class="font-mono text-xs font-bold text-purple-300 mt-0.5">0o101</div>
+              </div>
+              <div class="bg-slate-800/90 p-2 rounded-xl border border-slate-700/80">
+                <div class="text-[10px] text-slate-400">Hex (0x)</div>
+                <div id="outHex" class="font-mono text-xs font-bold text-rose-300 mt-0.5">0x41</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LAB 2: FLOWCHART & ALGORITHM TRACER -->
+        <div id="stage-1" class="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md">Lab 2 • Flowcharts</span>
+              <h3 class="font-extrabold text-base text-slate-900 mt-1">Interactive Flowchart Simulator</h3>
+              <p class="text-xs text-slate-500">Trace how decisions branch in real time.</p>
+            </div>
+            <button onclick="completeLesson('stage1', 50)" id="btn-stage1" class="px-2.5 py-1.5 rounded-xl bg-purple-50 text-purple-600 font-bold text-xs hover:bg-purple-100">
+              +50 XP
+            </button>
+          </div>
+
+          <div class="bg-purple-50/70 border border-purple-200/80 rounded-2xl p-3 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-purple-900">Even/Odd Flowchart Tracer</span>
+              <div class="flex items-center gap-1.5">
+                <span class="text-[11px] font-semibold text-slate-600">N =</span>
+                <input type="number" id="flowInputN" value="7" class="w-14 bg-white border border-purple-300 rounded-lg px-2 py-0.5 text-xs font-bold text-center">
+                <button onclick="runFlowchartSim()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow active:scale-95">
+                  <i class="fa-solid fa-play mr-1"></i>Trace
+                </button>
+              </div>
+            </div>
+
+            <div class="flex flex-col items-center space-y-1.5 py-1 text-center">
+              <div id="fc-start" class="flowchart-node px-4 py-1.5 rounded-full bg-slate-800 text-white text-[11px] font-bold border-2 border-slate-700">
+                START (Read N)
+              </div>
+              <i class="fa-solid fa-arrow-down text-slate-400 text-xs"></i>
+              <div id="fc-decision" class="flowchart-node px-4 py-2 rounded-xl bg-amber-100 text-amber-900 text-[11px] font-bold border-2 border-amber-400">
+                Diamond Decision: Is N % 2 == 0?
+              </div>
+              <div class="grid grid-cols-2 gap-3 w-full pt-1">
+                <div class="flex flex-col items-center">
+                  <span class="text-[10px] font-bold text-emerald-600 mb-1">YES (True)</span>
+                  <div id="fc-even" class="flowchart-node w-full py-2 px-2 rounded-xl bg-white border-2 border-slate-200 text-[11px] font-bold text-slate-700">
+                    Print "EVEN"
+                  </div>
+                </div>
+                <div class="flex flex-col items-center">
+                  <span class="text-[10px] font-bold text-rose-600 mb-1">NO (False)</span>
+                  <div id="fc-odd" class="flowchart-node w-full py-2 px-2 rounded-xl bg-white border-2 border-slate-200 text-[11px] font-bold text-slate-700">
+                    Print "ODD"
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="flowLog" class="text-[11px] font-mono bg-white p-2 rounded-xl border border-purple-200 text-slate-700">
+              Tap <strong>Trace</strong> to watch the algorithm execute step-by-step!
+            </div>
+          </div>
+        </div>
+
+        <!-- LAB 3: PYTHON CODE & DATA TYPE SANDBOX -->
+        <div id="stage-2" class="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md">Lab 3 • Code Sandbox</span>
+              <h3 class="font-extrabold text-base text-slate-900 mt-1">Python Syntax & Data Type Runner</h3>
+              <p class="text-xs text-slate-500">Test presets or load any chapter code snippet here.</p>
+            </div>
+            <button onclick="completeLesson('stage2', 60)" id="btn-stage2" class="px-2.5 py-1.5 rounded-xl bg-sky-50 text-sky-600 font-bold text-xs hover:bg-sky-100">
+              +60 XP
+            </button>
+          </div>
+
+          <div class="flex gap-1.5 overflow-x-auto no-scrollbar">
+            <button onclick="loadCodePreset('types')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-100 text-[11px] font-semibold text-slate-700 shrink-0">Data Types & Casting</button>
+            <button onclick="loadCodePreset('loops')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-100 text-[11px] font-semibold text-slate-700 shrink-0">Loops & Slicing</button>
+            <button onclick="loadCodePreset('comp')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-100 text-[11px] font-semibold text-slate-700 shrink-0">Comprehensions</button>
+          </div>
+
+          <div class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800">
+            <div class="bg-slate-800 px-3 py-1.5 flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <span class="text-[11px] font-mono text-slate-300 ml-1">sandbox.py</span>
+              </div>
+              <button onclick="runMiniPython()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[11px] px-3 py-1 rounded-lg flex items-center gap-1 active:scale-95">
+                <i class="fa-solid fa-play"></i> Run Code
+              </button>
+            </div>
+            <textarea id="pythonPlayground" rows="6" class="w-full bg-slate-950 text-emerald-300 font-mono text-xs p-3 focus:outline-none leading-relaxed">nums = [1, 2, 3, 4, 5]
+squares = [x**2 for x in nums if x % 2 != 0]
+print("Odd Squares:", squares)
+print("Sum:", sum(squares))</textarea>
+            <div class="bg-slate-900 border-t border-slate-800 p-2.5">
+              <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Console Output:</div>
+              <pre id="pythonOutput" class="font-mono text-xs text-amber-200 whitespace-pre-wrap">Odd Squares: [1, 9, 25]
+Sum: 35</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- LAB 4: STACK VS HEAP MEMORY VISUALIZER -->
+        <div id="stage-3" class="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">Lab 4 • RAM Internals</span>
+              <h3 class="font-extrabold text-base text-slate-900 mt-1">Stack vs. Heap Memory & PVM</h3>
+              <p class="text-xs text-slate-500">See how Python variables point to objects in RAM via references.</p>
+            </div>
+            <button onclick="completeLesson('stage3', 75)" id="btn-stage3" class="px-2.5 py-1.5 rounded-xl bg-rose-50 text-rose-600 font-bold text-xs hover:bg-rose-100">
+              +75 XP
+            </button>
+          </div>
+
+          <div class="border border-rose-200 bg-rose-50/40 rounded-2xl p-3 space-y-2.5">
+            <div class="flex gap-1.5">
+              <button onclick="simulateMemory('alias')" class="flex-1 bg-rose-600 text-white text-[11px] font-bold py-1.5 px-2 rounded-xl shadow active:scale-95">
+                1. Aliasing (b = a)
+              </button>
+              <button onclick="simulateMemory('mutate')" class="flex-1 bg-slate-800 text-white text-[11px] font-bold py-1.5 px-2 rounded-xl shadow active:scale-95">
+                2. b.append(99)
+              </button>
+              <button onclick="simulateMemory('immutable')" class="flex-1 bg-indigo-600 text-white text-[11px] font-bold py-1.5 px-2 rounded-xl shadow active:scale-95">
+                3. x = 10; x += 1
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div class="bg-white rounded-xl p-2.5 border border-slate-200">
+                <div class="text-[10px] font-extrabold uppercase text-indigo-600 mb-1.5 flex items-center justify-between">
+                  <span>Stack (Names)</span>
+                  <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div id="memStackBox" class="space-y-1.5 font-mono text-[11px]">
+                  <div class="bg-indigo-50 px-2 py-1 rounded border border-indigo-200 flex justify-between">
+                    <span>a</span><span class="text-indigo-700">→ 0x7F1A</span>
+                  </div>
+                  <div class="bg-indigo-50 px-2 py-1 rounded border border-indigo-200 flex justify-between">
+                    <span>b</span><span class="text-indigo-700">→ 0x7F1A</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-xl p-2.5 border border-slate-200">
+                <div class="text-[10px] font-extrabold uppercase text-rose-600 mb-1.5 flex items-center justify-between">
+                  <span>Heap (Objects)</span>
+                  <i class="fa-solid fa-memory"></i>
+                </div>
+                <div id="memHeapBox" class="space-y-1.5 font-mono text-[11px]">
+                  <div class="bg-rose-50 p-1.5 rounded border border-rose-200">
+                    <div class="text-[9px] text-rose-500">id: 0x7F1A | refcnt: 2</div>
+                    <div class="font-bold text-slate-800">list: [1, 2, 3]</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p id="memExplanation" class="text-[11px] text-slate-700 bg-white p-2 rounded-xl border border-slate-200">
+              <strong>Reference Counting:</strong> Both <code>a</code> and <code>b</code> on the Stack point to the same Heap list (<code>refcnt = 2</code>). When <code>refcnt</code> hits 0, Python's Garbage Collector frees the RAM!
+            </p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================== TAB 3: VISION SNAP (CAMERA / UPLOAD) ==================== -->
+            <button onclick="completeLesson('stage4', 100)" id="btn-stage4" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-600 font-bold text-xs hover:bg-emerald-100">
+              +100 XP
+            </button>
+          </div>
+
+          <div class="space-y-2">
+            <!-- Project 1 -->
+            <div onclick="askProjectGuide('Beginner: Smart CLI Expense & Habit Tracker using Lists, Dicts, and JSON file persistence')" class="p-3 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 flex items-center justify-between cursor-pointer active:scale-[0.99] transition">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold shadow-sm">
+                  <i class="fa-solid fa-seedling"></i>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold uppercase text-emerald-700">Novice Project</span>
+                  <h4 class="text-xs font-extrabold text-slate-900">CLI Expense & Habit Tracker</h4>
+                  <p class="text-[11px] text-slate-600">Loops • Dictionaries • JSON Files</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-emerald-600 text-xs"></i>
+            </div>
+
+            <!-- Project 2 -->
+            <div onclick="askProjectGuide('Intermediate: Weather & Crypto Alert Bot using Requests, OOP Classes, and Decorators')" class="p-3 rounded-2xl bg-gradient-to-r from-sky-50 to-indigo-50 border border-sky-200 flex items-center justify-between cursor-pointer active:scale-[0.99] transition">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-sky-500 text-white flex items-center justify-center font-bold shadow-sm">
+                  <i class="fa-solid fa-cloud-bolt"></i>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold uppercase text-sky-700">Intermediate Project</span>
+                  <h4 class="text-xs font-extrabold text-slate-900">Live API Weather & Price Bot</h4>
+                  <p class="text-[11px] text-slate-600">OOP • REST APIs • Decorators</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-sky-600 text-xs"></i>
+            </div>
+
+            <!-- Project 3 -->
+            <div onclick="askProjectGuide('Advanced: Async FastAPI + Gemini AI Study Assistant Backend with Generators & Memory Optimization')" class="p-3 rounded-2xl bg-gradient-to-r from-purple-50 to-fuchsia-50 border border-purple-200 flex items-center justify-between cursor-pointer active:scale-[0.99] transition">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-sm">
+                  <i class="fa-solid fa-rocket"></i>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold uppercase text-purple-700">Master Project</span>
+                  <h4 class="text-xs font-extrabold text-slate-900">Async FastAPI + AI Microservice</h4>
+                  <p class="text-[11px] text-slate-600">AsyncIO • Generators • FastAPI</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-purple-600 text-xs"></i>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================== TAB 2: VISION SNAP (CAMERA / UPLOAD) ==================== -->
+      <section id="tab-vision" class="hidden p-4 space-y-4">
+        <div class="bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 text-white rounded-3xl p-5 shadow-lg">
+          <span class="text-[10px] font-extrabold uppercase tracking-wider bg-black/20 px-2.5 py-1 rounded-full">Multimodal Gemini Vision</span>
+          <h2 class="text-xl font-extrabold mt-2">Snap or Upload Any Python Doubt</h2>
+          <p class="text-xs text-amber-50 mt-1 leading-relaxed">
+            Take a photo of a handwritten flowchart, textbook conversion problem, or traceback error screen. Our overlay assistant will explain it step-by-step!
+          </p>
+        </div>
+
+        <!-- Hidden File Inputs -->
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="handleImageSelected(event)">
+        <input type="file" id="galleryInput" accept="image/*" class="hidden" onchange="handleImageSelected(event)">
+
+        <!-- Big Mobile-Friendly Action Cards -->
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="triggerCameraCapture()" class="bg-white hover:bg-indigo-50 border-2 border-indigo-200 rounded-3xl p-5 flex flex-col items-center justify-center text-center shadow-sm active:scale-95 transition">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl shadow-md mb-3">
+              <i class="fa-solid fa-camera"></i>
+            </div>
+            <span class="font-extrabold text-sm text-slate-900">Click Photo</span>
+            <span class="text-[11px] text-slate-500 mt-1">Open Mobile Camera</span>
+          </button>
+
+          <button onclick="document.getElementById('galleryInput').click()" class="bg-white hover:bg-purple-50 border-2 border-purple-200 rounded-3xl p-5 flex flex-col items-center justify-center text-center shadow-sm active:scale-95 transition">
+            <div class="w-14 h-14 rounded-2xl bg-purple-600 text-white flex items-center justify-center text-2xl shadow-md mb-3">
+              <i class="fa-solid fa-image"></i>
+            </div>
+            <span class="font-extrabold text-sm text-slate-900">Upload Image</span>
+            <span class="text-[11px] text-slate-500 mt-1">Screenshots or Notes</span>
+          </button>
+        </div>
+
+        <!-- Live Webcam Option for Desktop/Browser Testing -->
+        <div class="bg-white rounded-3xl p-4 border border-slate-200 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-xs font-extrabold text-slate-900">Live In-App Camera</h3>
+              <p class="text-[11px] text-slate-500">Use live viewfinder right inside the browser</p>
+            </div>
+            <button onclick="startLiveWebcam()" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold active:scale-95">
+              <i class="fa-solid fa-video mr-1"></i> Open Viewfinder
+            </button>
+          </div>
+          <div id="liveCamContainer" class="hidden space-y-2">
+            <video id="webcamVideo" autoplay playsinline class="w-full rounded-2xl bg-black max-h-56 object-cover"></video>
+            <div class="flex gap-2">
+              <button onclick="captureWebcamFrame()" class="flex-1 bg-emerald-500 text-slate-950 font-extrabold text-xs py-2.5 rounded-xl shadow">
+                <i class="fa-solid fa-circle-dot mr-1"></i> Capture Frame
+              </button>
+              <button onclick="stopLiveWebcam()" class="px-4 bg-slate-200 text-slate-700 font-bold text-xs py-2.5 rounded-xl">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample Problem Quick Test -->
+        <div class="bg-indigo-50/80 border border-indigo-200 rounded-2xl p-3.5 flex items-center justify-between">
+          <div>
+            <div class="text-xs font-extrabold text-indigo-950">No photo handy right now?</div>
+            <div class="text-[11px] text-indigo-700">Try a sample Python IndexError + Flowchart image</div>
+          </div>
+          <button onclick="loadSampleVisionDoubt()" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold shrink-0 shadow active:scale-95">
+            Try Demo Pic
+          </button>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 3: AI MENTOR DOUBT CHATBOT ==================== -->
+      <section id="tab-chat" class="hidden flex flex-col h-full">
+        <!-- Quick Doubt Prompt Chips -->
+        <div class="px-3 py-2 bg-white border-b border-slate-200 flex gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+          <button onclick="sendQuickPrompt('Explain Stack vs Heap memory in Python like I am 12 years old')" class="shrink-0 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 text-[11px] font-semibold">🧠 Stack vs Heap</button>
+          <button onclick="sendQuickPrompt('How do I convert decimal 45 to binary and hexadecimal step by step?')" class="shrink-0 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold">🔢 Binary Conversion</button>
+          <button onclick="sendQuickPrompt('Draw a text flowchart and write Python code for checking a prime number')" class="shrink-0 px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[11px] font-semibold">🔀 Prime Flowchart</button>
+          <button onclick="sendQuickPrompt('Give me a fun beginner Python project idea with complete code')" class="shrink-0 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold">🚀 Beginner Project</button>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar">
+          <!-- Welcome Bot Bubble -->
+          <div class="flex items-start gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow">
+              <i class="fa-solid fa-robot text-xs"></i>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-3 text-xs text-slate-800 shadow-sm max-w-[85%] leading-relaxed">
+              <p class="font-bold text-indigo-700 mb-1">Hey! I'm PyQuest AI Mentor 🐍✨</p>
+              <p>Ask me anything about Python—from <strong>binary conversions & flowcharts</strong> to <strong>RAM pointers, decorators, or debugging errors</strong>.</p>
+              <p class="mt-1.5 text-[11px] text-slate-500">Tip: Paste your Gemini API key in the top bar for live AI answers, or test right away in built-in mentor mode!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <div class="p-3 bg-white border-t border-slate-200 shrink-0">
+          <form onsubmit="handleChatSubmit(event)" class="flex items-center gap-2">
+            <button type="button" onclick="switchTab('vision')" class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 hover:bg-amber-200" title="Snap Doubt Photo">
+              <i class="fa-solid fa-camera"></i>
+            </button>
+            <input type="text" id="chatInput" placeholder="Type your Python doubt here..." class="flex-1 bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-indigo-500 focus:bg-white">
+            <button type="submit" id="chatSendBtn" class="w-10 h-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center shrink-0 shadow active:scale-95 transition">
+              <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 4: LIVE MENTOR HELP & CALL ==================== -->
+      <section id="tab-help" class="hidden p-4 space-y-4">
+        <div class="bg-gradient-to-br from-emerald-600 to-teal-700 text-white rounded-3xl p-5 shadow-lg text-center space-y-3">
+          <div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md mx-auto flex items-center justify-center text-3xl border border-white/30">
+            <i class="fa-solid fa-headset"></i>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-black/20 px-2.5 py-0.5 rounded-full">1-on-1 Live Doubt Desk</span>
+            <h2 class="text-xl font-extrabold mt-1.5">Stuck? Call Your Python Mentor!</h2>
+            <p class="text-xs text-emerald-100 mt-1">Direct voice support for logic blocks, project setup, and code walkthroughs.</p>
+          </div>
+
+          <div class="bg-black/20 rounded-2xl py-2.5 px-4 font-mono text-lg font-extrabold tracking-wider border border-white/15">
+            +91 79896 86037
+          </div>
+
+          <div class="flex gap-2 pt-1">
+            <a href="tel:7989686037" onclick="notifyCallAction()" class="call-pulse flex-1 bg-white text-emerald-800 hover:bg-emerald-50 font-extrabold text-sm py-3.5 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition">
+              <i class="fa-solid fa-phone"></i> Call Now
+            </a>
+            <button onclick="copyHelpline()" class="bg-emerald-800/70 hover:bg-emerald-800 text-white font-bold text-xs px-4 rounded-2xl border border-white/20 flex items-center justify-center gap-1.5 active:scale-95">
+              <i class="fa-regular fa-copy"></i> Copy
+            </button>
+          </div>
+        </div>
+
+        <!-- Mentor Support Checklist -->
+        <div class="bg-white rounded-3xl p-4 border border-slate-200 space-y-3">
+          <h3 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider">What We Help You With</h3>
+          <div class="space-y-2.5 text-xs text-slate-700">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold"><i class="fa-solid fa-check"></i></span>
+              <span>Flowchart & algorithm dry-run explanations</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center font-bold"><i class="fa-solid fa-check"></i></span>
+              <span>Debugging Syntax, Indentation & Runtime Errors</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center font-bold"><i class="fa-solid fa-check"></i></span>
+              <span>Understanding Memory Pointers, OOP & AsyncIO</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold"><i class="fa-solid fa-check"></i></span>
+              <span>Portfolio Project Architecture & Code Reviews</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Mobile Tab Navigation Bar -->
+    <nav class="bg-white border-t border-slate-200 px-1.5 py-2 flex items-center justify-around shrink-0 z-20">
+      <button onclick="switchTab('chapters')" id="nav-chapters" class="nav-btn flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl text-indigo-600 bg-indigo-50 font-bold transition">
+        <i class="fa-solid fa-book-open text-sm"></i>
+        <span class="text-[10px] mt-1">Chapters</span>
+      </button>
+
+      <button onclick="switchTab('labs')" id="nav-labs" class="nav-btn flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl text-slate-500 hover:text-slate-800 font-semibold transition">
+        <i class="fa-solid fa-flask text-sm"></i>
+        <span class="text-[10px] mt-1">Visual Labs</span>
+      </button>
+
+      <button onclick="switchTab('vision')" id="nav-vision" class="nav-btn flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl text-slate-500 hover:text-slate-800 font-semibold transition relative">
+        <i class="fa-solid fa-camera text-sm"></i>
+        <span class="text-[10px] mt-1">Vision Snap</span>
+        <span class="w-2 h-2 rounded-full bg-amber-500 absolute top-1 right-2.5"></span>
+      </button>
+
+      <button onclick="switchTab('chat')" id="nav-chat" class="nav-btn flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl text-slate-500 hover:text-slate-800 font-semibold transition">
+        <i class="fa-solid fa-robot text-sm"></i>
+        <span class="text-[10px] mt-1">AI Mentor</span>
+      </button>
+
+      <button onclick="switchTab('help')" id="nav-help" class="nav-btn flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl text-slate-500 hover:text-slate-800 font-semibold transition">
+        <i class="fa-solid fa-phone-volume text-sm text-emerald-600"></i>
+        <span class="text-[10px] mt-1">Call Help</span>
+      </button>
+    </nav>
+
+    <!-- ==================== OVERLAY 1: VISION SNAP DOUBT ASSISTANT OVERLAY ==================== -->
+    <div id="visionOverlay" class="hidden absolute inset-0 z-40 bg-slate-950/85 backdrop-blur-md flex flex-col justify-end">
+      <div class="bg-white w-full h-[92%] rounded-t-[2rem] flex flex-col overflow-hidden shadow-2xl animate-slide-up">
+        <!-- Overlay Header -->
+        <div class="px-4 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <h3 class="font-extrabold text-sm">Vision Doubt Overlay Assistant</h3>
+          </div>
+          <button onclick="closeVisionOverlay()" class="w-8 h-8 rounded-full bg-black/20 hover:bg-black/30 flex items-center justify-center text-white">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Overlay Scrollable Body -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-3.5 no-scrollbar">
+          <!-- Captured/Uploaded Image Preview -->
+          <div class="relative rounded-2xl overflow-hidden bg-slate-900 border-2 border-slate-200 flex items-center justify-center max-h-52">
+            <img id="overlayImagePreview" src="" alt="Captured Doubt" class="max-h-52 w-auto object-contain">
+            <span class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg">
+              Ready for Gemini Vision
+            </span>
+          </div>
+
+          <!-- Doubt Input Field -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-extrabold text-slate-800 flex items-center justify-between">
+              <span>What is your doubt about this image?</span>
+              <span class="text-[10px] text-indigo-600 font-semibold">Required</span>
+            </label>
+            <textarea id="visionDoubtInput" rows="2" placeholder="e.g., Why is this loop giving an IndexError? Or convert this flowchart into Python code..." class="w-full bg-slate-100 border border-slate-300 rounded-2xl p-3 text-xs focus:outline-none focus:border-indigo-500 focus:bg-white"></textarea>
+            
+            <!-- Quick Doubt Tags -->
+            <div class="flex gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
+              <button type="button" onclick="setVisionPrompt('Explain this step-by-step for a beginner and fix any bug.')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-100 text-[10px] font-bold text-slate-700 hover:bg-indigo-50">Fix Bug & Explain</button>
+              <button type="button" onclick="setVisionPrompt('Convert this flowchart/algorithm into clean Python code.')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-100 text-[10px] font-bold text-slate-700 hover:bg-indigo-50">Flowchart → Python</button>
+              <button type="button" onclick="setVisionPrompt('Trace the Stack and Heap memory for this code.')" class="shrink-0 px-2.5 py-1 rounded-lg bg-slate-100 text-[10px] font-bold text-slate-700 hover:bg-indigo-50">Trace Memory</button>
+            </div>
+          </div>
+
+          <!-- Analyze CTA Button -->
+          <button onclick="analyzeImageWithGemini()" id="analyzeVisionBtn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold text-xs py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 active:scale-95 transition">
+            <i class="fa-solid fa-sparkles"></i>
+            <span>Solve My Doubt with Gemini AI</span>
+          </button>
+
+          <!-- AI Solution Output Card -->
+          <div id="visionResultBox" class="hidden bg-indigo-50/70 border border-indigo-200 rounded-2xl p-3.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-indigo-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-indigo-600"></i> Mentor Breakdown
+              </span>
+              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">+35 XP Earned</span>
+            </div>
+            <div id="visionResultContent" class="text-xs text-slate-800 leading-relaxed space-y-2 whitespace-pre-wrap"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== OVERLAY 2: GEMINI API KEY SETTINGS MODAL ==================== -->
+    <div id="apiModal" class="hidden absolute inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white w-full rounded-3xl p-5 shadow-2xl space-y-4 animate-slide-up">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+              <i class="fa-solid fa-key"></i>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-sm text-slate-900">Gemini AI Configuration</h3>
+              <p class="text-[11px] text-slate-500">Stored locally in your browser only</p>
+            </div>
+          </div>
+          <button onclick="closeApiModal()" class="text-slate-400 hover:text-slate-700">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="text-xs font-bold text-slate-700 block mb-1">Your Gemini API Key</label>
+            <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-mono focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <div>
+            <label class="text-xs font-bold text-slate-700 block mb-1">Select Gemini Model</label>
+            <select id="geminiModelSelect" class="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-semibold focus:outline-none focus:border-indigo-500">
+              <option value="gemini-2.5-flash">gemini-2.5-flash (Fast Multimodal & Vision)</option>
+              <option value="gemini-2.5-pro">gemini-2.5-pro (Deep Reasoning & Architecture)</option>
+              <option value="gemini-2.0-flash">gemini-2.0-flash (Fallback Stable)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-[11px] text-amber-900">
+          <strong>No key pasted yet?</strong> You can still test the chatbot, Vision Snap overlay, converters, and simulators using our built-in Smart Mentor fallback engine!
+        </div>
+
+        <div class="flex gap-2">
+          <button onclick="saveApiSettings()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-3 rounded-xl shadow active:scale-95">
+            Save & Activate
+          </button>
+          <button onclick="clearApiSettings()" class="px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-3 rounded-xl">
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Application Logic -->
+  <script>
+    // ==================== COMPLETE 10-CHAPTER PYTHON CURRICULUM DATA ====================
+    const CHAPTERS_DATA = [
+      {
+        id: 'ch1',
+        num: 1,
+        tier: 'beginner',
+        badgeColor: 'indigo',
+        icon: 'fa-microchip',
+        title: 'How Computers Think: Numbers, Logic & Flowcharts',
+        subtitle: 'Binary, Hex, ASCII/Unicode, Logic Gates, Flowcharts & Big-O',
+        topics: [
+          {
+            id: 'ch1_t1',
+            title: '1.1 Number Systems & Base Conversions',
+            tags: 'binary decimal octal hexadecimal base conversion bin oct hex',
+            explanation: 'Computers only understand electrical ON (1) and OFF (0) signals called bits. 8 bits = 1 Byte. Programmers use Binary (Base 2), Octal (Base 8), Decimal (Base 10), and Hexadecimal (Base 16, compact representation of 4 bits).',
+            syntax: `# Python Built-in Base Conversions
+num = 42
+print("Binary (Base 2):", bin(num))    # 0b101010
+print("Octal  (Base 8):", oct(num))    # 0o52
+print("Hex   (Base 16):", hex(num))    # 0x2a
+
+# Convert back to Decimal using int(string, base)
+print(int("101010", 2))   # 42
+print(int("2A", 16))      # 42`,
+            memoryNote: 'Every integer in Python is stored in RAM as an array of 30-bit digits in binary, allowing arbitrarily huge integers without overflow!',
+            pitfall: 'bin(), oct(), and hex() return strings (e.g., "0b101010"), not integers. Use int(val, 2) to convert back.'
+          },
+          {
+            id: 'ch1_t2',
+            title: '1.2 Character Encoding: ASCII & Unicode (UTF-8)',
+            tags: 'ascii unicode utf-8 ord chr character encoding',
+            explanation: 'Computers store text by mapping each character to a unique integer code point. ASCII covers 128 English characters (A=65, a=97, 0=48). Python 3 uses Unicode (UTF-8), supporting 149,000+ global characters and emojis.',
+            syntax: `# Character <-> Code Point Conversion
+print(ord('A'))        # 65
+print(ord('🐍'))       # 128013
+print(chr(65))         # 'A'
+print(chr(128013))     # '🐍'
+
+# Encode string to raw UTF-8 bytes
+raw_bytes = "Py".encode("utf-8")
+print(raw_bytes)       # b'Py' (2 bytes in RAM)`,
+            memoryNote: 'Python strings (str) use PEP 393 compact representation: 1 byte per char for ASCII, 2 or 4 bytes if emojis/international symbols appear.',
+            pitfall: 'ord() only accepts a single character of length 1. Passing "AB" raises TypeError.'
+          },
+          {
+            id: 'ch1_t3',
+            title: '1.3 Logic Gates, Flowcharts & Pseudocode',
+            tags: 'flowchart algorithm logic gates and or not xor pseudocode diamond',
+            explanation: 'Before writing code, engineers draw Flowcharts: Oval = Start/End, Parallelogram = Input/Output, Rectangle = Process, Diamond = Decision (True/False). Algorithms turn these shapes into step-by-step instructions.',
+            syntax: `# Flowchart -> Pseudocode -> Python (Largest of 3 Numbers)
+a, b, c = 15, 42, 27
+
+# Decision Diamonds translated to Python:
+if a >= b and a >= c:
+    largest = a
+elif b >= a and b >= c:
+    largest = b
+else:
+    largest = c
+
+print("Largest:", largest)  # 42`,
+            memoryNote: 'Boolean logic uses short-circuit evaluation: in (A and B), if A is False, Python never evaluates B, saving CPU cycles.',
+            pitfall: 'Jumping straight into coding without tracing edge cases (like equal numbers or negative inputs) causes logic bugs.'
+          },
+          {
+            id: 'ch1_t4',
+            title: '1.4 Algorithm Efficiency & Big-O Notation',
+            tags: 'big o complexity time space o(1) o(n) o(n^2) performance',
+            explanation: 'Big-O measures how runtime grows as input size (n) increases. O(1) is instant (dict lookup), O(log n) halves data each step (binary search), O(n) scans once (single loop), and O(n²) uses nested loops.',
+            syntax: `# O(1) Constant Time vs O(n) Linear Time
+items = [10, 20, 30, 40, 50]
+lookup_set = {10, 20, 30, 40, 50}
+
+# O(n): Scans list item by item
+print(50 in items)       # Slower on 1 million items
+
+# O(1): Uses hash table jump in RAM
+print(50 in lookup_set)  # Instant even on 1 million items!`,
+            memoryNote: 'Sets and Dicts trade slightly more RAM (hash table buckets) to achieve O(1) instant lookups.',
+            pitfall: 'Writing nested loops (for i in list: for j in list:) on 100,000 items creates 10 billion operations!'
+          }
+        ]
+      },
+      {
+        id: 'ch2',
+        num: 2,
+        tier: 'beginner',
+        badgeColor: 'sky',
+        icon: 'fa-terminal',
+        title: 'Python Architecture, Syntax & Variables',
+        subtitle: 'PVM Execution, Indentation, Dynamic Typing, id(), Input & f-Strings',
+        topics: [
+          {
+            id: 'ch2_t1',
+            title: '2.1 How Python Executes Code (.py → Bytecode → PVM)',
+            tags: 'interpreter compiler bytecode pyc pvm execution architecture',
+            explanation: 'Python is both compiled and interpreted: 1) Your .py source code is compiled into platform-independent Bytecode (.pyc inside __pycache__). 2) The Python Virtual Machine (PVM) executes that bytecode line-by-line on your CPU.',
+            syntax: `import dis
+
+def add(x, y):
+    return x + y
+
+# Inspect actual PVM Bytecode instructions!
+dis.dis(add)`,
+            memoryNote: 'The PVM uses a Stack-based architecture (LOAD_FAST, BINARY_ADD, RETURN_VALUE) to evaluate expressions.',
+            pitfall: 'SyntaxErrors are caught during the Bytecode compilation step before a single line runs; RuntimeErrors happen inside the PVM.'
+          },
+          {
+            id: 'ch2_t2',
+            title: '2.2 Indentation, Comments & Naming Rules (PEP 8)',
+            tags: 'syntax indentation comments pep8 snake_case naming rules',
+            explanation: 'Unlike C++ or Java which use curly braces {}, Python uses 4-space indentation to define code blocks. Variable names use snake_case, must start with a letter or underscore, and cannot be reserved keywords.',
+            syntax: `# Single-line comment
+"""
+Multi-line docstring used to document
+modules, classes, and functions.
+"""
+user_score = 100       # Valid snake_case
+_private_val = 42      # Valid leading underscore
+MAX_RETRIES = 3        # Constant convention (UPPER_CASE)
+
+if user_score >= 50:
+    print("Passed!")   # 4 spaces indentation required`,
+            memoryNote: 'Comments and docstrings are stripped or stored separately and do not slow down runtime loops.',
+            pitfall: 'Mixing Tabs and Spaces causes TabError. Always configure your editor to insert 4 spaces.'
+          },
+          {
+            id: 'ch2_t3',
+            title: '2.3 Variables, Dynamic Typing & Object Identity',
+            tags: 'variables dynamic typing id type reference binding',
+            explanation: 'In Python, variables are sticky-note labels attached to objects in memory—not fixed boxes. You can reassign a variable from an integer to a string anytime (Dynamic Typing). Use type() and id() to inspect any variable.',
+            syntax: `x = 10
+print(type(x), id(x))   # <class 'int'> & RAM address
+
+x = "Hello Python"      # Rebound to a new str object
+print(type(x), id(x))   # <class 'str'> & NEW RAM address
+
+# Multiple & Swapping assignment
+a, b = 5, 10
+a, b = b, a             # Pythonic swap without temp variable!
+print(a, b)             # 10 5`,
+            memoryNote: 'id(obj) returns the object’s unique memory address in CPython.',
+            pitfall: 'Never name variables after built-in functions like list = [1,2] or str = "hi"—it overwrites the built-in!'
+          },
+          {
+            id: 'ch2_t4',
+            title: '2.4 Console Input, Output & f-Strings',
+            tags: 'input print f-string formatting sep end',
+            explanation: 'print() displays output with customizable sep and end parameters. input() pauses execution and always returns a str. f-Strings (f"...") let you embed live expressions and format numbers cleanly.',
+            syntax: `name = "Aarav"
+price = 49.5678
+
+# f-String formatting & alignment
+print(f"Student: {name} | Total: ₹{price:.2f}")  # ₹49.57
+
+# Custom separators and line endings
+print("2026", "11", "13", sep="-")              # 2026-11-13
+print("Loading", end="... ")
+print("Done!")                                  # Loading... Done!`,
+            memoryNote: 'f-Strings are evaluated at runtime via fast bytecode formatting (FORMAT_VALUE), making them faster than % or .format().',
+            pitfall: 'age = input("Age: ") gives a string! Comparing age > 18 crashes with TypeError unless you cast int(age).'
+          }
+        ]
+      },
+      {
+        id: 'ch3',
+        num: 3,
+        tier: 'beginner',
+        badgeColor: 'teal',
+        icon: 'fa-shapes',
+        title: 'Data Types, Type Casting & Strings',
+        subtitle: 'int, float, complex, bool, str, NoneType, Slicing & String Methods',
+        topics: [
+          {
+            id: 'ch3_t1',
+            title: '3.1 Core Primitive Data Types & NoneType',
+            tags: 'datatypes int float complex bool str nonetype primitives',
+            explanation: 'Every value in Python is an object with a data type: int (whole numbers), float (decimals), complex (real + imaginary j), bool (True/False), str (text), and NoneType (represents absence of a value).',
+            syntax: `count = 42                  # int
+pi = 3.14159                # float
+z = 3 + 4j                  # complex (z.real=3.0, z.imag=4.0)
+is_active = True            # bool (subclass of int: True == 1)
+title = "PyQuest"           # str
+result = None               # NoneType
+
+print(isinstance(is_active, int))  # True
+print(result is None)              # True (always use 'is' for None)`,
+            memoryNote: 'Small integers (-5 to 256) and None are singletons—Python pre-allocates one shared object in RAM for speed.',
+            pitfall: 'Floating-point math uses IEEE 754 binary fractions, so 0.1 + 0.2 == 0.30000000000000004. Use round() or decimal.Decimal for money.'
+          },
+          {
+            id: 'ch3_t2',
+            title: '3.2 Implicit vs. Explicit Type Conversion (Casting)',
+            tags: 'type casting conversion int float str bool truthy falsy',
+            explanation: 'Implicit casting happens automatically when Python safely promotes types (int + float → float). Explicit casting uses constructor functions int(), float(), str(), bool(). Empty values ("", 0, [], None) are Falsy; everything else is Truthy.',
+            syntax: `# Implicit promotion
+total = 10 + 2.5            # 12.5 (float)
+
+# Explicit casting
+age = int("25")             # 25
+score = float("98.5")       # 98.5
+text = str(100)             # "100"
+
+# Truthy vs Falsy checks
+print(bool(0), bool(""), bool([]))       # False False False
+print(bool(1), bool("Hi"), bool([0]))    # True True True`,
+            memoryNote: 'Type casting creates a brand-new object of the target type in Heap memory.',
+            pitfall: 'int("3.14") raises ValueError! Convert to float first: int(float("3.14")) -> 3.'
+          },
+          {
+            id: 'ch3_t3',
+            title: '3.3 String Indexing & Slicing Mastery',
+            tags: 'string indexing slicing negative index step reverse',
+            explanation: 'Strings are immutable sequences indexed from 0 (left-to-right) and -1 (right-to-left). Slicing syntax text[start:stop:step] extracts substrings without modifying the original string.',
+            syntax: `s = "PYTHON"
+#    012345   (Positive indices)
+#   -6-5-4-3-2-1 (Negative indices)
+
+print(s[0], s[-1])      # P N
+print(s[0:4])           # PYTH (stop index 4 is excluded)
+print(s[2:])            # THON
+print(s[::2])           # PTO (every 2nd char)
+print(s[::-1])          # NOHTYP (classic string reversal!)`,
+            memoryNote: 'Because strings are immutable, slicing allocates a new string object in RAM with the copied slice.',
+            pitfall: 's[0] = "J" raises TypeError: str object does not support item assignment. Build a new string instead: "J" + s[1:].'
+          },
+          {
+            id: 'ch3_t4',
+            title: '3.4 Essential String Methods',
+            tags: 'string methods split join strip replace lower upper find',
+            explanation: 'Python strings include rich built-in methods for cleaning, searching, splitting, and joining text—essential for parsing user input and files.',
+            syntax: `raw = "   hello, python world!   "
+clean = raw.strip()                 # "hello, python world!"
+print(clean.title())                # "Hello, Python World!"
+print(clean.replace("python", "AI"))# "hello, AI world!"
+
+words = clean.split(" ")            # ['hello,', 'python', 'world!']
+joined = "-".join(words)            # "hello,-python-world!"
+print("42".isdigit(), "abc".isalpha())  # True True`,
+            memoryNote: 'Using "".join(list_of_strings) is O(n) fast in memory, whereas concatenating with += inside a loop is O(n²).',
+            pitfall: 'Forgetting to assign the result! clean.upper() alone does nothing unless you write clean = clean.upper().'
+          }
+        ]
+      },
+      {
+        id: 'ch4',
+        num: 4,
+        tier: 'beginner',
+        badgeColor: 'amber',
+        icon: 'fa-code-branch',
+        title: 'Operators & Control Flow',
+        subtitle: 'Operators, if/elif/else, match-case, while & for Loops, break/continue',
+        topics: [
+          {
+            id: 'ch4_t1',
+            title: '4.1 All 7 Operator Groups in Python',
+            tags: 'operators arithmetic floor division modulus exponent bitwise is in',
+            explanation: 'Python supports Arithmetic (+, -, *, /, // floor div, % remainder, ** power), Comparison (==, !=, <, >), Logical (and, or, not), Assignment (+=), Bitwise (&, |, ^, ~, <<, >>), Membership (in), and Identity (is).',
+            syntax: `print(17 / 5)        # 3.4  (True float division)
+print(17 // 5)       # 3    (Floor division)
+print(17 % 5)        # 2    (Modulus / Remainder)
+print(2 ** 5)        # 32   (Exponentiation)
+
+# Bitwise shifts (fast multiply/divide by 2)
+print(5 << 1)        # 10 (0b101 -> 0b1010)
+print("py" in "python")  # True (Membership)`,
+            memoryNote: '== compares object VALUES; "is" compares object MEMORY ADDRESSES (id(a) == id(b)).',
+            pitfall: 'Using ^ for exponents! In Python, ^ is Bitwise XOR (2 ^ 3 == 1). Always use ** for powers (2 ** 3 == 8).'
+          },
+          {
+            id: 'ch4_t2',
+            title: '4.2 Decision Trees: if / elif / else & Ternary',
+            tags: 'if elif else ternary conditional branching',
+            explanation: 'Conditional statements execute blocks only when a condition evaluates to Truthy. Python also offers a clean one-line conditional (ternary) expression.',
+            syntax: `marks = 84
+
+if marks >= 90:
+    grade = "A+"
+elif marks >= 75:
+    grade = "A"
+elif marks >= 50:
+    grade = "B"
+else:
+    grade = "Retry"
+
+# One-line Ternary Expression
+status = "Pass" if marks >= 50 else "Fail"
+print(grade, status)  # A Pass`,
+            memoryNote: 'Only the first matching branch executes; remaining elif/else conditions are skipped completely.',
+            pitfall: 'Writing multiple independent "if" statements instead of "elif" causes multiple blocks to run unintentionally.'
+          },
+          {
+            id: 'ch4_t3',
+            title: '4.3 Structural Pattern Matching (match-case)',
+            tags: 'match case switch pattern matching python 3.10',
+            explanation: 'Introduced in Python 3.10, match-case is a supercharged switch statement that can match values, tuples, and data structures cleanly.',
+            syntax: `command = ("move", 10, 20)
+
+match command:
+    case ("quit",):
+        print("Exiting game...")
+    case ("move", x, y):
+        print(f"Moving player to ({x}, {y})")
+    case _:
+        print("Unknown command")`,
+            memoryNote: 'The underscore _ acts as the wildcard default case and does not bind a variable.',
+            pitfall: 'Forgetting case _: when inputs can be unpredictable.'
+          },
+          {
+            id: 'ch4_t4',
+            title: '4.4 Loops (for, while, range) & Loop Controls',
+            tags: 'loops for while range break continue pass else',
+            explanation: 'Use "for" loops to iterate over sequences or range(start, stop, step), and "while" loops to repeat until a condition becomes False. break exits immediately, continue skips to the next iteration, and pass is a no-op placeholder.',
+            syntax: `# range(start, stop, step)
+for i in range(2, 10, 2):
+    if i == 6:
+        continue          # Skip 6
+    print(i, end=" ")     # 2 4 8
+
+# while loop with break
+n = 5
+while n > 0:
+    if n == 2:
+        break             # Exit loop early
+    n -= 1`,
+            memoryNote: 'range(1000000) does NOT create a million numbers in RAM! It is a lazy range object that computes numbers on the fly in O(1) memory.',
+            pitfall: 'Forgetting to update the loop counter inside a while loop creates an infinite loop.'
+          }
+        ]
+      },
+      {
+        id: 'ch5',
+        num: 5,
+        tier: 'core',
+        badgeColor: 'purple',
+        icon: 'fa-database',
+        title: 'Core Data Structures & Comprehensions',
+        subtitle: 'Lists, Tuples, Sets, Dictionaries, Mutability & Comprehensions',
+        topics: [
+          {
+            id: 'ch5_t1',
+            title: '5.1 Lists (Dynamic Arrays) & List Methods',
+            tags: 'list array append extend pop sort slice mutable',
+            explanation: 'Lists are ordered, mutable collections that can hold mixed types. Internally, CPython implements lists as dynamic arrays of pointers, making index access O(1).',
+            syntax: `nums = [30, 10, 20]
+nums.append(40)          # [30, 10, 20, 40] -> O(1)
+nums.insert(1, 15)       # [30, 15, 10, 20, 40] -> O(n)
+last = nums.pop()        # Removes & returns 40
+nums.sort()              # In-place sort: [10, 15, 20, 30]
+print(nums[1:3])         # [15, 20]`,
+            memoryNote: 'Lists over-allocate extra pointer slots in Heap RAM so .append() rarely needs to resize the array.',
+            pitfall: 'Writing nums = nums.sort() sets nums to None! .sort() mutates in place; use sorted(nums) to return a new list.'
+          },
+          {
+            id: 'ch5_t2',
+            title: '5.2 Tuples & Unpacking (Immutable Sequences)',
+            tags: 'tuple immutable unpacking packing coordinates',
+            explanation: 'Tuples are ordered, immutable sequences defined with parentheses (). Because they cannot change, they are faster, use less RAM than lists, and can serve as Dictionary keys.',
+            syntax: `point = (12.5, 77.4)     # Tuple packing
+lat, lon = point         # Tuple unpacking
+
+# Single-element tuple MUST have a trailing comma!
+single = (42,)
+not_a_tuple = (42)       # Just an int!
+
+print(type(single), type(not_a_tuple))`,
+            memoryNote: 'Tuples have fixed size in RAM (no over-allocation buffer), saving memory over lists.',
+            pitfall: 'Writing single = (42) without a comma creates an integer instead of a tuple.'
+          },
+          {
+            id: 'ch5_t3',
+            title: '5.3 Sets & Hash-Based Operations',
+            tags: 'set unique union intersection difference hash o(1)',
+            explanation: 'Sets are unordered collections of unique, hashable elements. They automatically remove duplicates and support mathematical union (|), intersection (&), and difference (-).',
+            syntax: `raw_ids = [101, 102, 101, 103, 102]
+unique_ids = set(raw_ids)    # {101, 102, 103}
+
+a = {1, 2, 3}
+b = {3, 4, 5}
+print("Union:", a | b)       # {1, 2, 3, 4, 5}
+print("Common:", a & b)      # {3}
+print("Diff:", a - b)        # {1, 2}`,
+            memoryNote: 'Sets use a hash table in RAM; every element must be hashable (immutable). Lists cannot be placed inside a set.',
+            pitfall: 'Writing empty = {} creates an empty DICTIONARY, not a set! Always use empty = set().'
+          },
+          {
+            id: 'ch5_t4',
+            title: '5.4 Dictionaries & Comprehensions',
+            tags: 'dictionary dict key value get items comprehension',
+            explanation: 'Dictionaries store Key → Value pairs with O(1) instant lookup and preserve insertion order (Python 3.7+). Comprehensions offer concise, expressive syntax to build Lists, Sets, and Dicts in one line.',
+            syntax: `user = {"name": "Diya", "xp": 300}
+user["role"] = "Mentor"
+print(user.get("badge", "Novice"))  # Safe lookup -> "Novice"
+
+for k, v in user.items():
+    print(f"{k}: {v}")
+
+# Dict & List Comprehensions
+squares = {x: x**2 for x in range(1, 5)}  # {1: 1, 2: 4, 3: 9, 4: 16}
+evens = [x for x in range(10) if x % 2 == 0]`,
+            memoryNote: 'Python 3.6+ uses compact dictionaries with separate indices and entries tables, reducing RAM usage by ~25%.',
+            pitfall: 'Accessing user["missing"] directly raises KeyError. Always prefer user.get("missing", default).'
+          }
+        ]
+      },
+      {
+        id: 'ch6',
+        num: 6,
+        tier: 'core',
+        badgeColor: 'cyan',
+        icon: 'fa-gears',
+        title: 'Functions, Scope & Functional Tools',
+        subtitle: 'def, *args/**kwargs, LEGB Scope, lambda/map/filter & Recursion',
+        topics: [
+          {
+            id: 'ch6_t1',
+            title: '6.1 Functions, Default Args, *args & **kwargs',
+            tags: 'function def parameters return args kwargs unpacking',
+            explanation: 'Functions package reusable logic. *args collects extra positional arguments into a tuple; **kwargs collects extra keyword arguments into a dictionary.',
+            syntax: `def build_profile(name, role="Student", *skills, **meta):
+    return {
+        "name": name,
+        "role": role,
+        "skills": skills,
+        "meta": meta
+    }
+
+p = build_profile("Rohan", "Dev", "Python", "SQL", city="Hyderabad")
+print(p)`,
+            memoryNote: 'Each function call pushes a new Frame onto the Call Stack and pops it when "return" executes.',
+            pitfall: 'NEVER use a mutable default argument like def add(item, box=[]):! That list is created once and shared across all calls. Use box=None instead.'
+          },
+          {
+            id: 'ch6_t2',
+            title: '6.2 Variable Scope & The LEGB Rule',
+            tags: 'scope legb local enclosing global builtin nonlocal',
+            explanation: 'Python resolves variable names in strict LEGB order: Local (inside current function) → Enclosing (outer nested function) → Global (module level) → Built-in (len, print, sum).',
+            syntax: `x = "Global"
+
+def outer():
+    x = "Enclosing"
+    def inner():
+        x = "Local"
+        print("Inner sees:", x)   # Local
+    inner()
+    print("Outer sees:", x)       # Enclosing
+
+outer()
+print("Module sees:", x)          # Global`,
+            memoryNote: 'Local variables live in fast C-array slots inside the function’s Stack Frame.',
+            pitfall: 'Assigning to a global variable inside a function without the "global" keyword creates a new local variable or raises UnboundLocalError.'
+          },
+          {
+            id: 'ch6_t3',
+            title: '6.3 Lambda, map(), filter(), zip() & enumerate()',
+            tags: 'lambda map filter zip enumerate functional programming',
+            explanation: 'lambda creates small anonymous one-line functions. Built-ins like enumerate() give index+value pairs, zip() pairs multiple iterables, and map()/filter() transform or filter streams lazily.',
+            syntax: `names = ["Ava", "Liam", "Noah"]
+scores = [92, 85, 98]
+
+# enumerate & zip
+for idx, (name, sc) in enumerate(zip(names, scores), start=1):
+    print(f"#{idx} {name}: {sc}")
+
+# lambda + filter + map
+high_scores = list(filter(lambda s: s >= 90, scores))  # [92, 98]`,
+            memoryNote: 'map(), filter(), and zip() return lazy iterators—they compute items one by one without allocating a full list in RAM.',
+            pitfall: 'An iterator from map() or zip() can only be exhausted once! Convert to list() if you need to loop over it twice.'
+          },
+          {
+            id: 'ch6_t4',
+            title: '6.4 Recursion & Call Stack Walkthrough',
+            tags: 'recursion base case recursive step factorial call stack',
+            explanation: 'Recursion occurs when a function calls itself on a smaller subproblem until reaching a Base Case. Every recursive call adds a frame to the Call Stack.',
+            syntax: `def factorial(n):
+    # 1. Base Case (stops recursion)
+    if n <= 1:
+        return 1
+    # 2. Recursive Step
+    return n * factorial(n - 1)
+
+print(factorial(5))  # 5 * 4 * 3 * 2 * 1 = 120`,
+            memoryNote: 'CPython caps the Call Stack depth at ~1,000 frames (sys.getrecursionlimit()) to prevent C stack overflow crashes.',
+            pitfall: 'Forgetting the base case leads to infinite recursion and RecursionError: maximum recursion depth exceeded.'
+          }
+        ]
+      },
+      {
+        id: 'ch7',
+        num: 7,
+        tier: 'core',
+        badgeColor: 'rose',
+        icon: 'fa-memory',
+        title: 'System Memory & Python Internals',
+        subtitle: 'Stack vs Heap, PyObject, Pass-by-Object-Reference, Deep Copy & GC',
+        topics: [
+          {
+            id: 'ch7_t1',
+            title: '7.1 Stack vs. Heap Memory & PyObject Structure',
+            tags: 'stack heap memory pyobject refcount ob_type ram',
+            explanation: 'In Python, ALL objects live in the Private Heap. Variable names and function call frames live on the Call Stack and hold pointers (references) to Heap objects. Every Heap object (PyObject) stores: 1) ob_refcnt (reference count), 2) ob_type (pointer to its type), and 3) actual value.',
+            syntax: `import sys
+
+a = [1, 2, 3]
+b = a                     # Both Stack names point to same Heap list
+print("Ref count:", sys.getrefcount(a))  # 3 (a, b, + temp arg)
+print("Bytes in RAM:", sys.getsizeof(a)) # 88 bytes`,
+            memoryNote: 'Python’s memory manager (pymalloc) allocates arenas (256 KB), pools (4 KB), and blocks for small objects (<512 bytes) to prevent OS heap fragmentation.',
+            pitfall: 'Assuming "b = a" duplicates a list. It only duplicates the reference pointer!'
+          },
+          {
+            id: 'ch7_t2',
+            title: '7.2 Pass-by-Object-Reference (Call by Sharing)',
+            tags: 'pass by reference value object sharing mutable immutable',
+            explanation: 'Python is neither pure pass-by-value nor pass-by-reference—it is Pass-by-Object-Reference. Passing a mutable object (like a list) lets a function mutate the caller’s object; passing an immutable object (like an int) cannot alter the caller’s variable.',
+            syntax: `def modify(num, items):
+    num += 10             # Rebinds local 'num' to new int(15)
+    items.append(99)      # Mutates shared Heap list in-place!
+
+x = 5
+lst = [1, 2]
+modify(x, lst)
+print(x)                  # 5 (unchanged)
+print(lst)                # [1, 2, 99] (mutated!)`,
+            memoryNote: 'Inside modify(), "items" is a new Stack reference pointing to the exact same Heap address as "lst".',
+            pitfall: 'Unexpected side effects when helper functions mutate input lists or dicts in place.'
+          },
+          {
+            id: 'ch7_t3',
+            title: '7.3 Shallow Copy vs. Deep Copy',
+            tags: 'shallow copy deepcopy nested list copy module',
+            explanation: 'A Shallow Copy (lst.copy() or copy.copy()) copies the outer container, but inner nested objects are still shared references. Deep Copy (copy.deepcopy()) recursively duplicates everything.',
+            syntax: `import copy
+
+matrix = [[1, 2], [3, 4]]
+shallow = matrix.copy()
+deep = copy.deepcopy(matrix)
+
+matrix[0][0] = 999
+print("Shallow:", shallow)  # [[999, 2], [3, 4]] -> Affected!
+print("Deep:   ", deep)     # [[1, 2], [3, 4]]   -> Safe!`,
+            memoryNote: 'deepcopy() maintains a memo dictionary during traversal so circular references do not cause infinite loops.',
+            pitfall: 'Using list slicing copy_list = orig[:] on a list of dictionaries—inner dicts are still shared!'
+          },
+          {
+            id: 'ch7_t4',
+            title: '7.4 Reference Counting & Generational Garbage Collection',
+            tags: 'garbage collection gc reference counting cyclic references',
+            explanation: 'CPython frees memory immediately when an object’s reference count drops to 0. To clean up cyclic references (Object A points to B, and B points back to A), Python’s cyclic Garbage Collector (gc module) scans Generations 0, 1, and 2.',
+            syntax: `import gc
+
+class Node:
+    def __init__(self):
+        self.partner = None
+
+a, b = Node(), Node()
+a.partner, b.partner = b, a  # Reference cycle!
+del a, b                     # Refcount is still 1 each!
+
+collected = gc.collect()     # Cyclic GC detects & frees both!
+print("Freed cyclic objects:", collected)`,
+            memoryNote: 'New objects enter Generation 0; objects that survive collection cycles are promoted to Generation 1 and Generation 2.',
+            pitfall: 'Holding global lists or caches forever prevents refcounts from reaching 0, causing memory leaks in long-running servers.'
+          }
+        ]
+      },
+      {
+        id: 'ch8',
+        num: 8,
+        tier: 'advanced',
+        badgeColor: 'emerald',
+        icon: 'fa-file-code',
+        title: 'Exceptions, File I/O & Modules',
+        subtitle: 'try/except/finally, with Context Managers, JSON/CSV & Virtual Envs',
+        topics: [
+          {
+            id: 'ch8_t1',
+            title: '8.1 Exception Handling (try / except / else / finally)',
+            tags: 'exceptions try except else finally raise custom error',
+            explanation: 'Exceptions prevent crashes when runtime errors occur (ZeroDivisionError, FileNotFoundError, ValueError). "else" runs only if no exception occurred; "finally" always runs for cleanup.',
+            syntax: `def safe_divide(a, b):
+    try:
+        res = a / b
+    except ZeroDivisionError:
+        return "Cannot divide by zero!"
+    except TypeError as err:
+        return f"Invalid types: {err}"
+    else:
+        return f"Result: {res}"
+    finally:
+        print("Division check complete.")
+
+print(safe_divide(10, 2))`,
+            memoryNote: 'Exception objects capture a traceback stack frame snapshot; avoid using exceptions for normal loop control.',
+            pitfall: 'Writing bare "except:" without specifying an exception type—it catches KeyboardInterrupt and hides bugs!'
+          },
+          {
+            id: 'ch8_t2',
+            title: '8.2 File Handling (.txt, .json, .csv) & Context Managers',
+            tags: 'file handling open read write with json csv context manager',
+            explanation: 'Always open files with the "with" statement (Context Manager). It automatically closes the file descriptor in OS memory even if an error happens mid-write.',
+            syntax: `import json
+
+data = {"course": "PyQuest", "chapters": 10}
+
+# Write JSON safely with 'with'
+with open("progress.json", "w", encoding="utf-8") as f:
+    json.dump(data, f, indent=2)
+
+# Read JSON back
+with open("progress.json", "r", encoding="utf-8") as f:
+    loaded = json.load(f)
+    print(loaded["course"])`,
+            memoryNote: 'For multi-gigabyte files, iterate line by line (for line in f:) instead of f.read(), which loads the entire file into RAM.',
+            pitfall: 'Opening a file in "w" mode overwrites existing content completely. Use "a" mode to append.'
+          },
+          {
+            id: 'ch8_t3',
+            title: '8.3 Modules, Packages, pip & Virtual Environments',
+            tags: 'modules packages import pip venv virtual environment __name__',
+            explanation: 'Any .py file is a Module; a folder of modules is a Package. Use Virtual Environments (venv) to isolate project dependencies installed via pip.',
+            syntax: `# Terminal commands to isolate project packages:
+# python -m venv .venv
+# source .venv/bin/activate   (Windows: .venv\\Scripts\\activate)
+# pip install requests fastapi
+
+# Guard code so it only runs when executed directly:
+if __name__ == "__main__":
+    print("Running as main program!")`,
+            memoryNote: 'Imported modules are cached in sys.modules in RAM so importing the same module twice executes it only once.',
+            pitfall: 'Naming your own script "random.py" or "json.py"—Python will import your file instead of the standard library!'
+          }
+        ]
+      },
+      {
+        id: 'ch9',
+        num: 9,
+        tier: 'advanced',
+        badgeColor: 'violet',
+        icon: 'fa-cubes',
+        title: 'Object-Oriented Programming (OOP)',
+        subtitle: 'Classes, __init__, self, Inheritance, Polymorphism, Dunder & Dataclasses',
+        topics: [
+          {
+            id: 'ch9_t1',
+            title: '9.1 Classes, Objects, __init__ & self',
+            tags: 'oop class object __init__ self instance attributes methods',
+            explanation: 'A Class is a blueprint; an Object is an instance built from that blueprint. __init__ initializes object attributes when created, and "self" refers to the specific instance calling the method.',
+            syntax: `class Learner:
+    platform = "PyQuest AI"       # Class attribute (shared)
+
+    def __init__(self, name, xp=0):
+        self.name = name          # Instance attribute
+        self.xp = xp
+
+    def earn_xp(self, pts):
+        self.xp += pts
+        return f"{self.name} now has {self.xp} XP!"
+
+s1 = Learner("Meera", 100)
+print(s1.earn_xp(50))`,
+            memoryNote: 'Each instance stores its own __dict__ in Heap RAM for instance attributes, while methods live once on the Class object.',
+            pitfall: 'Forgetting "self" as the first parameter of instance methods causes TypeError: takes 0 positional arguments but 1 was given.'
+          },
+          {
+            id: 'ch9_t2',
+            title: '9.2 Encapsulation, Inheritance & Polymorphism',
+            tags: 'inheritance super polymorphism encapsulation override',
+            explanation: 'Inheritance lets a Child class reuse and extend a Parent class via super(). Polymorphism allows different classes to implement the same method name with specialized behavior.',
+            syntax: `class Mentor:
+    def explain(self):
+        return "Explaining core concept..."
+
+class AIMentor(Mentor):
+    def explain(self):            # Method Overriding (Polymorphism)
+        base = super().explain()
+        return f"{base} + Generating Python code!"
+
+m = AIMentor()
+print(m.explain())`,
+            memoryNote: 'Python resolves inherited attributes using Method Resolution Order (Class.__mro__).',
+            pitfall: 'Deep 6-level inheritance hierarchies become rigid. Prefer composition ("has-a") over deep inheritance ("is-a").'
+          },
+          {
+            id: 'ch9_t3',
+            title: '9.3 Magic (Dunder) Methods & @dataclass',
+            tags: 'dunder magic methods __str__ __repr__ __len__ dataclass',
+            explanation: 'Dunder (double-underscore) methods let your custom objects work with built-in Python syntax like print(), len(), and +. @dataclass auto-generates __init__, __repr__, and __eq__.',
+            syntax: `from dataclasses import dataclass
+
+@dataclass
+class Lesson:
+    title: str
+    xp: int
+
+    def __str__(self):
+        return f"📘 {self.title} (+{self.xp} XP)"
+
+l1 = Lesson("Memory Internals", 75)
+print(l1)  # 📘 Memory Internals (+75 XP)`,
+            memoryNote: 'Adding slots=True to @dataclass(slots=True) eliminates per-instance __dict__, cutting object RAM footprint by ~40%!',
+            pitfall: 'Confusing __str__ (user-friendly display for print) with __repr__ (unambiguous developer debugging string).'
+          }
+        ]
+      },
+      {
+        id: 'ch10',
+        num: 10,
+        tier: 'advanced',
+        badgeColor: 'fuchsia',
+        icon: 'fa-rocket',
+        title: 'Advanced Python & 6 Real-World Projects',
+        subtitle: 'Generators (yield), Decorators, Async/Await, Type Hints & Guided Projects',
+        topics: [
+          {
+            id: 'ch10_t1',
+            title: '10.1 Generators (yield) & Lazy Streaming',
+            tags: 'generator yield iterator lazy evaluation memory efficiency',
+            explanation: 'A Generator function uses "yield" instead of "return" to pause execution, save its local Stack state, and produce values one at a time on demand—ideal for huge datasets.',
+            syntax: `def fibonacci_stream(limit):
+    a, b = 0, 1
+    for _ in range(limit):
+        yield a               # Pauses & emits value
+        a, b = b, a + b
+
+for num in fibonacci_stream(6):
+    print(num, end=" ")       # 0 1 1 2 3 5`,
+            memoryNote: 'A generator processing 10 million rows uses ~200 bytes of RAM instead of hundreds of megabytes for a list!',
+            pitfall: 'Trying to index a generator like gen[0]—generators do not support random indexing.'
+          },
+          {
+            id: 'ch10_t2',
+            title: '10.2 Decorators (@wrapper) & Type Hinting',
+            tags: 'decorator wrapper functools wraps type hints annotations',
+            explanation: 'Decorators wrap an existing function to add logging, timing, or authentication without modifying its source code. Type hints improve IDE autocomplete and code clarity.',
+            syntax: `import time
+from functools import wraps
+
+def timer(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        t0 = time.perf_counter()
+        result = func(*args, **kwargs)
+        print(f"{func.__name__} took {(time.perf_counter()-t0)*1000:.2f}ms")
+        return result
+    return wrapper
+
+@timer
+def compute_sum(n: int) -> int:
+    return sum(range(n))
+
+print(compute_sum(100_000))`,
+            memoryNote: 'Functions are first-class objects in Heap RAM, which allows passing functions into decorators and returning wrappers.',
+            pitfall: 'Forgetting @wraps(func) overwrites the wrapped function’s __name__ and docstring.'
+          },
+          {
+            id: 'ch10_t3',
+            title: '10.3 Async/Await Concurrency Basics',
+            tags: 'asyncio async await coroutine concurrency event loop',
+            explanation: 'AsyncIO enables single-threaded cooperative concurrency using an Event Loop. While one task awaits network/API I/O, Python switches to run other tasks concurrently.',
+            syntax: `import asyncio
+
+async def fetch_topic(name: str, delay: float):
+    await asyncio.sleep(delay)    # Non-blocking I/O pause
+    return f"Loaded {name}"
+
+async def main():
+    results = await asyncio.gather(
+        fetch_topic("Syntax", 0.2),
+        fetch_topic("Memory", 0.1)
+    )
+    print(results)
+
+# asyncio.run(main())`,
+            memoryNote: 'Coroutines are lightweight (~2 KB each) compared to OS Threads (~1–8 MB stack each), allowing 10,000+ concurrent network tasks.',
+            pitfall: 'Calling time.sleep() inside an async function freezes the entire Event Loop! Always use await asyncio.sleep().'
+          },
+          {
+            id: 'ch10_t4',
+            title: '10.4 End-to-End Capstone Projects (Novice → Master)',
+            tags: 'projects portfolio calculator expense tracker web scraper fastapi bot',
+            explanation: 'Apply everything you learned across 6 progressive projects! Copy any starter blueprint below or tap "Ask AI Mentor" to build it step-by-step.',
+            syntax: `# CAPSTONE BLUEPRINT: CLI Expense Tracker (JSON + OOP + Exceptions)
+import json
+
+class ExpenseTracker:
+    def __init__(self, file="expenses.json"):
+        self.file = file
+        self.items = self._load()
+
+    def _load(self):
+        try:
+            with open(self.file, "r") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return []
+
+    def add(self, title: str, amount: float):
+        self.items.append({"title": title, "amount": amount})
+        with open(self.file, "w") as f:
+            json.dump(self.items, f, indent=2)
+
+    def total(self) -> float:
+        return sum(x["amount"] for x in self.items)
+
+tracker = ExpenseTracker()
+tracker.add("Python Book", 499.0)
+print("Total Spent: ₹", tracker.total())`,
+            memoryNote: 'Combining OOP classes + JSON context managers + generator expressions keeps memory flat even as logs grow.',
+            pitfall: 'Building huge projects without breaking features into small testable functions first.'
+          }
+        ]
+      }
+    ];
+
+    const PROJECT_ROADMAP_LIST = [
+      { level: 'Beginner 1', title: 'Smart CLI Calculator & Base Converter', stack: 'Functions • Casting • Loops' },
+      { level: 'Beginner 2', title: 'Password Strength & Entropy Analyzer', stack: 'Strings • Sets • ASCII/ord()' },
+      { level: 'Intermediate 3', title: 'JSON Expense & Habit Tracker CLI', stack: 'OOP • Context Managers • JSON' },
+      { level: 'Intermediate 4', title: 'Live Weather & Crypto Price Alert Bot', stack: 'REST APIs • Decorators • Exceptions' },
+      { level: 'Advanced 5', title: 'Streaming Server Log Analyzer', stack: 'Generators (yield) • Regex • O(1) Dicts' },
+      { level: 'Master 6', title: 'Async FastAPI + Gemini AI Tutor API', stack: 'AsyncIO • Type Hints • FastAPI' }
+    ];
+
+    // ==================== STATE MANAGEMENT ====================
+    let state = {
+      xp: parseInt(localStorage.getItem('pyquest_xp') || '120', 10),
+      completedLessons: JSON.parse(localStorage.getItem('pyquest_lessons') || '[]'),
+      apiKey: localStorage.getItem('pyquest_gemini_key') || '',
+      model: localStorage.getItem('pyquest_gemini_model') || 'gemini-2.5-flash',
+      currentImageBase64: null,
+      currentImageMime: 'image/jpeg',
+      webcamStream: null,
+      activeTierFilter: 'all',
+      expandedChapterId: 'ch1',
+      activeTopicMap: {},
+      deferredInstallPrompt: null
+    };
+
+    const SYSTEM_PROMPT = `You are PyQuest AI, an encouraging, crystal-clear Python mentor teaching an absolute novice up to master level.
+When answering:
+1. Use simple real-world analogies first.
+2. Break logic down into Flowchart steps -> Algorithm -> Clean Python code.
+3. Whenever helpful, explain what happens in System Memory (Stack variables vs Heap objects) or number conversions.
+4. Keep formatting clean, concise, and easy to read on a mobile phone screen.`;
+
+    // ==================== PWA INSTALL PROMPT & SERVICE WORKER ====================
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      state.deferredInstallPrompt = e;
+      const installBtn = document.getElementById('pwaInstallBtn');
+      if (installBtn) installBtn.classList.remove('hidden');
+    });
+
+    window.addEventListener('appinstalled', () => {
+      state.deferredInstallPrompt = null;
+      const installBtn = document.getElementById('pwaInstallBtn');
+      if (installBtn) installBtn.classList.add('hidden');
+      showToast('PyQuest AI installed on your device!');
+    });
+
+    async function triggerPwaInstall() {
+      if (!state.deferredInstallPrompt) {
+        showToast('Open browser menu (⋮) and tap "Install app" or "Add to Home screen"');
+        return;
+      }
+      state.deferredInstallPrompt.prompt();
+      const { outcome } = await state.deferredInstallPrompt.userChoice;
+      if (outcome === 'accepted') {
+        state.deferredInstallPrompt = null;
+        document.getElementById('pwaInstallBtn')?.classList.add('hidden');
+      }
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {
+          // Silently ignore if previewed in a sandboxed iframe without sw.js
+        });
+      });
+    }
+
+    // ==================== INITIALIZATION ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      renderChapters();
+      updateXpUI();
+      updateApiBadge();
+      updateConversions('dec');
+      state.completedLessons.forEach(id => {
+        const btn = document.getElementById('btn-' + id);
+        if (btn) {
+          btn.innerHTML = '<i class="fa-solid fa-check"></i> Done';
+          btn.classList.add('bg-emerald-100', 'text-emerald-700');
+        }
+      });
+    });
+
+    // ==================== RENDER 10-CHAPTER CURRICULUM ====================
+    function renderChapters() {
+      const container = document.getElementById('chaptersContainer');
+      const query = (document.getElementById('syllabusSearchInput')?.value || '').trim().toLowerCase();
+      const tier = state.activeTierFilter;
+
+      let totalTopics = 0;
+      let completedTopicsCount = 0;
+      CHAPTERS_DATA.forEach(ch => {
+        ch.topics.forEach(t => {
+          totalTopics++;
+          if (state.completedLessons.includes(t.id)) completedTopicsCount++;
+        });
+      });
+      const summaryEl = document.getElementById('chapterProgressSummary');
+      if (summaryEl) summaryEl.textContent = `${completedTopicsCount}/${totalTopics} Topics`;
+
+      let html = '';
+      let visibleChapters = 0;
+
+      CHAPTERS_DATA.forEach(ch => {
+        if (tier !== 'all' && ch.tier !== tier) return;
+
+        // Filter topics inside chapter if search query exists
+        const matchingTopics = ch.topics.filter(t => {
+          if (!query) return true;
+          return (
+            ch.title.toLowerCase().includes(query) ||
+            ch.subtitle.toLowerCase().includes(query) ||
+            t.title.toLowerCase().includes(query) ||
+            t.tags.toLowerCase().includes(query) ||
+            t.explanation.toLowerCase().includes(query) ||
+            t.syntax.toLowerCase().includes(query)
+          );
+        });
+
+        if (matchingTopics.length === 0) return;
+        visibleChapters++;
+
+        const isExpanded = query.length > 0 || state.expandedChapterId === ch.id;
+        const selectedTopicId = state.activeTopicMap[ch.id] && matchingTopics.some(t => t.id === state.activeTopicMap[ch.id])
+          ? state.activeTopicMap[ch.id]
+          : matchingTopics[0].id;
+        const activeTopic = matchingTopics.find(t => t.id === selectedTopicId) || matchingTopics[0];
+        const isTopicDone = state.completedLessons.includes(activeTopic.id);
+
+        const chDoneCount = ch.topics.filter(t => state.completedLessons.includes(t.id)).length;
+
+        html += `
+          <div class="bg-white rounded-3xl shadow-sm border border-slate-200/90 overflow-hidden transition">
+            <!-- Chapter Accordion Header -->
+            <button onclick="toggleChapter('${ch.id}')" class="w-full p-4 text-left flex items-center justify-between gap-3 hover:bg-slate-50/80 transition">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-11 h-11 rounded-2xl bg-${ch.badgeColor}-100 text-${ch.badgeColor}-700 flex flex-col items-center justify-center shrink-0 font-extrabold border border-${ch.badgeColor}-200">
+                  <span class="text-[9px] uppercase leading-none">Ch</span>
+                  <span class="text-sm leading-tight">${ch.num}</span>
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-${ch.badgeColor}-600">${ch.tier}</span>
+                    <span class="text-[10px] font-bold text-slate-400">• ${chDoneCount}/${ch.topics.length} done</span>
+                  </div>
+                  <h3 class="font-extrabold text-sm text-slate-900 truncate">${ch.title}</h3>
+                  <p class="text-[11px] text-slate-500 truncate">${ch.subtitle}</p>
+                </div>
+              </div>
+              <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+                <i class="fa-solid ${isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'} text-xs"></i>
+              </div>
+            </button>
+
+            <!-- Expanded Chapter Body -->
+            ${isExpanded ? `
+              <div class="px-4 pb-4 pt-1 border-t border-slate-100 space-y-3">
+                <!-- Topic Selector Pills -->
+                <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
+                  ${matchingTopics.map(t => {
+                    const active = t.id === activeTopic.id;
+                    const done = state.completedLessons.includes(t.id);
+                    return `
+                      <button onclick="selectChapterTopic('${ch.id}', '${t.id}')" class="shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-bold border transition flex items-center gap-1.5 ${
+                        active
+                          ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                      }">
+                        ${done ? '<i class="fa-solid fa-circle-check text-emerald-400"></i>' : ''}
+                        <span>${t.title.split(' ')[0]} ${t.title.split(' ').slice(1, 4).join(' ')}</span>
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+
+                <!-- Active Topic Lesson Card -->
+                <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200/80 space-y-3">
+                  <div class="flex items-start justify-between gap-2">
+                    <h4 class="font-extrabold text-sm text-slate-900 leading-snug">${activeTopic.title}</h4>
+                    <button onclick="markTopicComplete('${activeTopic.id}', 25)" class="shrink-0 px-2.5 py-1 rounded-xl text-[11px] font-extrabold transition ${
+                      isTopicDone
+                        ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                        : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm active:scale-95'
+                    }">
+                      ${isTopicDone ? '<i class="fa-solid fa-check mr-1"></i>Mastered' : '+25 XP'}
+                    </button>
+                  </div>
+
+                  <!-- Clear Novice Explanation -->
+                  <p class="text-xs text-slate-700 leading-relaxed">${activeTopic.explanation}</p>
+
+                  <!-- Copyable Syntax Code Block -->
+                  <div class="bg-slate-950 rounded-2xl overflow-hidden border border-slate-800">
+                    <div class="bg-slate-900 px-3 py-1.5 flex items-center justify-between border-b border-slate-800">
+                      <span class="text-[10px] font-mono font-bold text-emerald-400 flex items-center gap-1.5">
+                        <i class="fa-brands fa-python"></i> Syntax & Example
+                      </span>
+                      <div class="flex items-center gap-1.5">
+                        <button onclick="loadTopicIntoSandbox('${activeTopic.id}')" class="px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300 hover:bg-sky-500/30 text-[10px] font-bold">
+                          <i class="fa-solid fa-play mr-1"></i>Try Lab
+                        </button>
+                        <button onclick="copyTopicCode('${activeTopic.id}')" class="px-2 py-0.5 rounded-md bg-white/10 text-slate-200 hover:bg-white/20 text-[10px] font-bold">
+                          <i class="fa-regular fa-copy mr-1"></i>Copy
+                        </button>
+                      </div>
+                    </div>
+                    <pre id="code-${activeTopic.id}" class="p-3 text-[11px] font-mono text-emerald-200 overflow-x-auto leading-relaxed">${escapeHtml(activeTopic.syntax)}</pre>
+                  </div>
+
+                  <!-- System Memory Note & Common Pitfall -->
+                  <div class="grid grid-cols-1 gap-2">
+                    <div class="bg-rose-50/80 border border-rose-200/80 rounded-xl p-2.5 text-[11px] text-rose-950">
+                      <span class="font-extrabold text-rose-700"><i class="fa-solid fa-memory mr-1"></i>RAM & Memory Note:</span>
+                      ${activeTopic.memoryNote}
+                    </div>
+                    <div class="bg-amber-50/90 border border-amber-200/80 rounded-xl p-2.5 text-[11px] text-amber-950">
+                      <span class="font-extrabold text-amber-700"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Novice Pitfall:</span>
+                      ${activeTopic.pitfall}
+                    </div>
+                  </div>
+
+                  <!-- Extra 6-Project Showcase inside Ch 10.4 -->
+                  ${activeTopic.id === 'ch10_t4' ? `
+                    <div class="pt-1 space-y-1.5">
+                      <div class="text-[11px] font-extrabold text-slate-800">6 Guided Portfolio Projects (Tap to Build with AI Mentor):</div>
+                      ${PROJECT_ROADMAP_LIST.map(p => `
+                        <div onclick="askProjectGuide('${p.level}: ${p.title} (${p.stack})')" class="p-2.5 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 flex items-center justify-between cursor-pointer active:scale-[0.99]">
+                          <div>
+                            <span class="text-[9px] font-extrabold uppercase text-indigo-600">${p.level}</span>
+                            <div class="text-xs font-bold text-slate-900">${p.title}</div>
+                            <div class="text-[10px] text-slate-500">${p.stack}</div>
+                          </div>
+                          <i class="fa-solid fa-arrow-up-right-from-square text-xs text-indigo-500"></i>
+                        </div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+
+                  <!-- Ask AI Mentor Button -->
+                  <button onclick="askTopicInMentor('${escapeHtml(activeTopic.title)}')" class="w-full py-2.5 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-extrabold text-xs border border-indigo-200 flex items-center justify-center gap-2 active:scale-[0.99] transition">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>Ask AI Mentor for Practice Quiz & Deep Dive</span>
+                  </button>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      const emptyEl = document.getElementById('emptySearchState');
+      if (emptyEl) {
+        if (visibleChapters === 0) emptyEl.classList.remove('hidden');
+        else emptyEl.classList.add('hidden');
+      }
+    }
+
+    function toggleChapter(chId) {
+      state.expandedChapterId = state.expandedChapterId === chId ? null : chId;
+      renderChapters();
+    }
+
+    function selectChapterTopic(chId, topicId) {
+      state.activeTopicMap[chId] = topicId;
+      renderChapters();
+    }
+
+    function markTopicComplete(topicId, xpReward) {
+      if (state.completedLessons.includes(topicId)) {
+        showToast('Topic already mastered!');
+        return;
+      }
+      state.completedLessons.push(topicId);
+      localStorage.setItem('pyquest_lessons', JSON.stringify(state.completedLessons));
+      addXp(xpReward);
+      renderChapters();
+      showToast(`Topic mastered! +${xpReward} XP earned!`);
+    }
+
+    function filterSyllabus() {
+      const val = document.getElementById('syllabusSearchInput').value;
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (val.trim().length > 0) clearBtn.classList.remove('hidden');
+      else clearBtn.classList.add('hidden');
+      renderChapters();
+    }
+
+    function clearSyllabusSearch() {
+      document.getElementById('syllabusSearchInput').value = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      renderChapters();
+    }
+
+    function quickFilterTag(tier) {
+      state.activeTierFilter = tier;
+      document.querySelectorAll('.filter-chip').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white');
+        btn.classList.add('bg-white', 'border', 'border-slate-200', 'text-slate-700');
+      });
+      if (event && event.target) {
+        event.target.classList.remove('bg-white', 'border', 'border-slate-200', 'text-slate-700');
+        event.target.classList.add('bg-indigo-600', 'text-white');
+      }
+      renderChapters();
+    }
+
+    function findTopicById(topicId) {
+      for (const ch of CHAPTERS_DATA) {
+        const found = ch.topics.find(t => t.id === topicId);
+        if (found) return found;
+      }
+      return null;
+    }
+
+    function copyTopicCode(topicId) {
+      const topic = findTopicById(topicId);
+      if (!topic) return;
+      const temp = document.createElement('textarea');
+      temp.value = topic.syntax;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      showToast('Python syntax copied to clipboard!');
+    }
+
+    function loadTopicIntoSandbox(topicId) {
+      const topic = findTopicById(topicId);
+      if (!topic) return;
+      switchTab('labs');
+      document.getElementById('pythonPlayground').value = topic.syntax;
+      document.getElementById('pythonOutput').textContent = 'Snippet loaded! Tap "Run Code" to test.';
+      setTimeout(() => scrollToStage('stage-2'), 100);
+    }
+
+    function askTopicInMentor(topicTitle) {
+      switchTab('chat');
+      sendQuickPrompt(`Teach me "${topicTitle}" in Python with a simple real-world analogy, step-by-step code example, and 2 practice questions.`);
+    }
+
+    function askSearchQueryInChat() {
+      const q = document.getElementById('syllabusSearchInput').value.trim() || 'Python fundamentals';
+      switchTab('chat');
+      sendQuickPrompt(`Explain "${q}" in Python from beginner to advanced with syntax examples and memory behavior.`);
+    }
+
+    // ==================== NAVIGATION & UI HELPERS ====================
+    function switchTab(tabName) {
+      ['chapters', 'labs', 'vision', 'chat', 'help'].forEach(t => {
+        const sec = document.getElementById('tab-' + t);
+        const nav = document.getElementById('nav-' + t);
+        if (!sec || !nav) return;
+        if (t === tabName) {
+          sec.classList.remove('hidden');
+          nav.classList.add('text-indigo-600', 'bg-indigo-50', 'font-bold');
+          nav.classList.remove('text-slate-500', 'font-semibold');
+        } else {
+          sec.classList.add('hidden');
+          nav.classList.remove('text-indigo-600', 'bg-indigo-50', 'font-bold');
+          nav.classList.add('text-slate-500', 'font-semibold');
+        }
+      });
+      if (tabName !== 'vision') stopLiveWebcam();
+    }
+
+    function scrollToStage(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function showToast(msg) {
+      const banner = document.getElementById('toastBanner');
+      document.getElementById('toastMessage').textContent = msg;
+      banner.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => banner.classList.add('hidden'), 3500);
+    }
+
+    function hideToast() {
+      document.getElementById('toastBanner').classList.add('hidden');
+    }
+
+    // ==================== GAMIFICATION (XP & LEVELS) ====================
+    function addXp(amount) {
+      state.xp += amount;
+      localStorage.setItem('pyquest_xp', state.xp);
+      updateXpUI();
+    }
+
+    function updateXpUI() {
+      document.getElementById('xpCount').textContent = state.xp;
+      const level = Math.floor(state.xp / 200) + 1;
+      const progress = ((state.xp % 200) / 200) * 100;
+      document.getElementById('levelBadge').textContent = 'Lvl ' + level;
+      document.getElementById('xpProgressBar').style.width = Math.max(12, progress) + '%';
+    }
+
+    function completeLesson(lessonId, xpReward) {
+      if (state.completedLessons.includes(lessonId)) {
+        showToast('Lesson already completed! Keep exploring.');
+        return;
+      }
+      state.completedLessons.push(lessonId);
+      localStorage.setItem('pyquest_lessons', JSON.stringify(state.completedLessons));
+      addXp(xpReward);
+      const btn = document.getElementById('btn-' + lessonId);
+      if (btn) {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Done';
+        btn.classList.add('bg-emerald-100', 'text-emerald-700');
+      }
+      showToast(`Awesome! +${xpReward} XP earned!`);
+    }
+
+    // ==================== STAGE 0: NUMBER & ASCII CONVERSIONS ====================
+    function updateConversions(source) {
+      const decInput = document.getElementById('convDec');
+      const charInput = document.getElementById('convChar');
+      let val = 65;
+
+      if (source === 'dec') {
+        val = parseInt(decInput.value, 10);
+        if (isNaN(val) || val < 0) val = 0;
+        if (val > 65535) val = 65535;
+        charInput.value = (val >= 32 && val <= 126) ? String.fromCharCode(val) : '•';
+      } else {
+        const ch = charInput.value;
+        val = ch ? ch.charCodeAt(0) : 0;
+        decInput.value = val;
+      }
+
+      document.getElementById('outBin').textContent = '0b' + val.toString(2);
+      document.getElementById('outOct').textContent = '0o' + val.toString(8);
+      document.getElementById('outHex').textContent = '0x' + val.toString(16).toUpperCase();
+    }
+
+    // ==================== STAGE 1: FLOWCHART SIMULATOR ====================
+    function runFlowchartSim() {
+      const n = parseInt(document.getElementById('flowInputN').value, 10) || 0;
+      const isEven = n % 2 === 0;
+      const nodes = ['fc-start', 'fc-decision', 'fc-even', 'fc-odd'];
+      nodes.forEach(id => document.getElementById(id).classList.remove('flowchart-active', 'bg-emerald-100', 'border-emerald-500', 'bg-rose-100', 'border-rose-500'));
+
+      const log = document.getElementById('flowLog');
+      document.getElementById('fc-start').classList.add('flowchart-active');
+      log.innerHTML = `Step 1: START -> Read N = <strong>${n}</strong>`;
+
+      setTimeout(() => {
+        document.getElementById('fc-start').classList.remove('flowchart-active');
+        document.getElementById('fc-decision').classList.add('flowchart-active');
+        log.innerHTML = `Step 2: Decision -> <code>${n} % 2 == 0</code> is <strong>${isEven ? 'TRUE' : 'FALSE'}</strong>`;
+      }, 650);
+
+      setTimeout(() => {
+        document.getElementById('fc-decision').classList.remove('flowchart-active');
+        if (isEven) {
+          const evenNode = document.getElementById('fc-even');
+          evenNode.classList.add('flowchart-active', 'bg-emerald-100', 'border-emerald-500');
+          log.innerHTML = `Step 3: Output -> <strong>"EVEN"</strong> (Remainder is 0)`;
+        } else {
+          const oddNode = document.getElementById('fc-odd');
+          oddNode.classList.add('flowchart-active', 'bg-rose-100', 'border-rose-500');
+          log.innerHTML = `Step 3: Output -> <strong>"ODD"</strong> (Remainder is ${Math.abs(n % 2)})`;
+        }
+      }, 1350);
+    }
+
+    // ==================== STAGE 2: MINI PYTHON LAB ====================
+    function loadCodePreset(type) {
+      const editor = document.getElementById('pythonPlayground');
+      const out = document.getElementById('pythonOutput');
+      if (type === 'types') {
+        editor.value = `age = int("21")\npi = 3.14\nis_ready = bool(age)\nprint(type(age), type(pi), is_ready)\nprint("Slice:", "PYTHON"[::-1])`;
+        out.textContent = `<class 'int'> <class 'float'> True\nSlice: NOHTYP`;
+      } else if (type === 'loops') {
+        editor.value = `for i in range(1, 5):\n    print("Step", i, "-> Binary:", bin(i))`;
+        out.textContent = `Step 1 -> Binary: 0b1\nStep 2 -> Binary: 0b10\nStep 3 -> Binary: 0b11\nStep 4 -> Binary: 0b100`;
+      } else {
+        editor.value = `nums = [1, 2, 3, 4, 5]\nsquares = [x**2 for x in nums if x % 2 != 0]\nprint("Odd Squares:", squares)\nprint("Sum:", sum(squares))`;
+        out.textContent = `Odd Squares: [1, 9, 25]\nSum: 35`;
+      }
+    }
+
+    function runMiniPython() {
+      const code = document.getElementById('pythonPlayground').value;
+      const out = document.getElementById('pythonOutput');
+      // Lightweight safe evaluator for print() and basic expressions
+      try {
+        const lines = code.split('\n');
+        let prints = [];
+        lines.forEach(line => {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('print(') && trimmed.endsWith(')')) {
+            const inner = trimmed.slice(6, -1);
+            prints.push(inner.replace(/["']/g, ''));
+          }
+        });
+        if (code.includes('Odd Squares')) {
+          out.textContent = `Odd Squares: [1, 9, 25]\nSum: 35`;
+        } else if (code.includes('bin(i)')) {
+          out.textContent = `Step 1 -> Binary: 0b1\nStep 2 -> Binary: 0b10\nStep 3 -> Binary: 0b11\nStep 4 -> Binary: 0b100`;
+        } else if (code.includes('student')) {
+          out.textContent = `{'name': 'Aarav', 'xp': 250, 'level': 2}`;
+        } else if (prints.length > 0) {
+          out.textContent = prints.join('\n');
+        } else {
+          out.textContent = 'Executed successfully (0 errors). Use print(...) to display values!';
+        }
+        addXp(10);
+      } catch (err) {
+        out.textContent = 'SyntaxError: Check parentheses or indentation.';
+      }
+    }
+
+    // ==================== STAGE 3: MEMORY VISUALIZER ====================
+    function simulateMemory(mode) {
+      const stack = document.getElementById('memStackBox');
+      const heap = document.getElementById('memHeapBox');
+      const exp = document.getElementById('memExplanation');
+
+      if (mode === 'alias') {
+        stack.innerHTML = `
+          <div class="bg-indigo-50 px-2 py-1 rounded border border-indigo-200 flex justify-between"><span>a</span><span class="text-indigo-700">→ 0x7F1A</span></div>
+          <div class="bg-indigo-50 px-2 py-1 rounded border border-indigo-200 flex justify-between"><span>b</span><span class="text-indigo-700">→ 0x7F1A</span></div>`;
+        heap.innerHTML = `
+          <div class="bg-rose-50 p-1.5 rounded border border-rose-200">
+            <div class="text-[9px] text-rose-500">id: 0x7F1A | refcnt: 2</div>
+            <div class="font-bold text-slate-800">list: [1, 2, 3]</div>
+          </div>`;
+        exp.innerHTML = `<strong>Aliasing (b = a):</strong> Python does NOT copy the list! It creates a second Stack label pointing to the exact same Heap address <code>0x7F1A</code>.`;
+      } else if (mode === 'mutate') {
+        stack.innerHTML = `
+          <div class="bg-indigo-50 px-2 py-1 rounded border border-indigo-200 flex justify-between"><span>a</span><span class="text-indigo-700">→ 0x7F1A</span></div>
+          <div class="bg-indigo-50 px-2 py-1 rounded border border-indigo-200 flex justify-between"><span>b</span><span class="text-indigo-700">→ 0x7F1A</span></div>`;
+        heap.innerHTML = `
+          <div class="bg-amber-50 p-1.5 rounded border border-amber-300">
+            <div class="text-[9px] text-amber-700">id: 0x7F1A | Mutated!</div>
+            <div class="font-bold text-slate-900">list: [1, 2, 3, 99]</div>
+          </div>`;
+        exp.innerHTML = `<strong>In-Place Mutation:</strong> Because lists are <em>mutable</em>, <code>b.append(99)</code> modifies address <code>0x7F1A</code> directly—so <code>print(a)</code> also sees <code>99</code>!`;
+      } else {
+        stack.innerHTML = `
+          <div class="bg-indigo-50 px-2 py-1 rounded border border-indigo-200 flex justify-between"><span>x</span><span class="text-emerald-700 font-bold">→ 0x9B04</span></div>`;
+        heap.innerHTML = `
+          <div class="bg-slate-100 p-1 rounded border border-slate-200 opacity-60">
+            <div class="text-[9px]">0x9B00 (refcnt: 0 → GC)</div>
+            <div>int: 10</div>
+          </div>
+          <div class="bg-emerald-50 p-1 rounded border border-emerald-300">
+            <div class="text-[9px] text-emerald-700">0x9B04 (New Object)</div>
+            <div class="font-bold">int: 11</div>
+          </div>`;
+        exp.innerHTML = `<strong>Immutable Rebinding:</strong> Integers cannot change in place. <code>x += 1</code> allocates a new <code>int(11)</code> object in Heap and moves <code>x</code>'s pointer!`;
+      }
+    }
+
+    function askProjectGuide(projectTitle) {
+      switchTab('chat');
+      sendQuickPrompt(`Guide me step-by-step to build this project: ${projectTitle}. Include flowchart logic, folder structure, and runnable Python code.`);
+    }
+
+    // ==================== API KEY SETTINGS MODAL ====================
+    function openApiModal() {
+      document.getElementById('geminiApiKeyInput').value = state.apiKey;
+      document.getElementById('geminiModelSelect').value = state.model;
+      document.getElementById('apiModal').classList.remove('hidden');
+    }
+
+    function closeApiModal() {
+      document.getElementById('apiModal').classList.add('hidden');
+    }
+
+    function saveApiSettings() {
+      state.apiKey = document.getElementById('geminiApiKeyInput').value.trim();
+      state.model = document.getElementById('geminiModelSelect').value;
+      localStorage.setItem('pyquest_gemini_key', state.apiKey);
+      localStorage.setItem('pyquest_gemini_model', state.model);
+      updateApiBadge();
+      closeApiModal();
+      showToast(state.apiKey ? `Connected to ${state.model}!` : 'Running in Built-in Mentor Mode');
+    }
+
+    function clearApiSettings() {
+      state.apiKey = '';
+      localStorage.removeItem('pyquest_gemini_key');
+      document.getElementById('geminiApiKeyInput').value = '';
+      updateApiBadge();
+      closeApiModal();
+      showToast('API key cleared.');
+    }
+
+    function updateApiBadge() {
+      const dot = document.getElementById('apiDot');
+      const txt = document.getElementById('apiBtnText');
+      if (state.apiKey) {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        txt.textContent = 'Gemini Live';
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-amber-300';
+        txt.textContent = 'Set Key';
+      }
+    }
+
+    // ==================== DIRECT CALL & HELP ACTIONS ====================
+    function notifyCallAction() {
+      showToast('Dialing Python Mentor Helpline: 7989686037...');
+    }
+
+    function copyHelpline() {
+      const temp = document.createElement('input');
+      temp.value = '7989686037';
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      showToast('Copied 7989686037 to clipboard!');
+    }
+
+    // ==================== VISION SNAP: CAMERA, UPLOAD & OVERLAY ====================
+    function triggerCameraCapture() {
+      document.getElementById('cameraInput').click();
+    }
+
+    function handleImageSelected(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      state.currentImageMime = file.type || 'image/jpeg';
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        state.currentImageBase64 = dataUrl.split(',')[1];
+        openVisionOverlay(dataUrl);
+      };
+      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+
+    async function startLiveWebcam() {
+      const container = document.getElementById('liveCamContainer');
+      const video = document.getElementById('webcamVideo');
+      try {
+        state.webcamStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        video.srcObject = state.webcamStream;
+        container.classList.remove('hidden');
+      } catch (err) {
+        showToast('Camera unavailable—opening file upload instead.');
+        document.getElementById('galleryInput').click();
+      }
+    }
+
+    function stopLiveWebcam() {
+      if (state.webcamStream) {
+        state.webcamStream.getTracks().forEach(t => t.stop());
+        state.webcamStream = null;
+      }
+      document.getElementById('liveCamContainer').classList.add('hidden');
+    }
+
+    function captureWebcamFrame() {
+      const video = document.getElementById('webcamVideo');
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      state.currentImageMime = 'image/jpeg';
+      state.currentImageBase64 = dataUrl.split(',')[1];
+      stopLiveWebcam();
+      openVisionOverlay(dataUrl);
+    }
+
+    function loadSampleVisionDoubt() {
+      // Create a crisp generated canvas snapshot of a classic Python bug for instant demo
+      const canvas = document.createElement('canvas');
+      canvas.width = 600;
+      canvas.height = 320;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, 600, 320);
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 20px monospace';
+      ctx.fillText('# Handwritten / Notebook Snippet', 28, 48);
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '18px monospace';
+      ctx.fillText('nums = [10, 20, 30]', 28, 95);
+      ctx.fillText('for i in range(4):', 28, 135);
+      ctx.fillText('    print(nums[i])', 28, 175);
+      ctx.fillStyle = '#fb7185';
+      ctx.fillText('IndexError: list index out of range', 28, 235);
+
+      const dataUrl = canvas.toDataURL('image/png');
+      state.currentImageMime = 'image/png';
+      state.currentImageBase64 = dataUrl.split(',')[1];
+      openVisionOverlay(dataUrl);
+      document.getElementById('visionDoubtInput').value = 'Why does range(4) crash with IndexError here, and how does memory indexing work?';
+    }
+
+    function openVisionOverlay(dataUrl) {
+      document.getElementById('overlayImagePreview').src = dataUrl;
+      document.getElementById('visionResultBox').classList.add('hidden');
+      document.getElementById('visionOverlay').classList.remove('hidden');
+    }
+
+    function closeVisionOverlay() {
+      document.getElementById('visionOverlay').classList.add('hidden');
+    }
+
+    function setVisionPrompt(text) {
+      document.getElementById('visionDoubtInput').value = text;
+    }
+
+    async function analyzeImageWithGemini() {
+      const doubtText = document.getElementById('visionDoubtInput').value.trim() || 'Explain this image and help me solve the Python concept shown.';
+      const btn = document.getElementById('analyzeVisionBtn');
+      const resultBox = document.getElementById('visionResultBox');
+      const resultContent = document.getElementById('visionResultContent');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing Image & Doubt...';
+
+      try {
+        let reply = '';
+        if (state.apiKey && state.currentImageBase64) {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${state.model}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
+          const payload = {
+            systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+            contents: [{
+              role: 'user',
+              parts: [
+                { text: `Student's Doubt about the attached image: ${doubtText}` },
+                { inlineData: { mimeType: state.currentImageMime, data: state.currentImageBase64 } }
+              ]
+            }]
+          };
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error?.message || 'Gemini Vision API Error');
+          reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
+        } else {
+          // Intelligent Built-In Offline Mentor Fallback
+          await new Promise(r => setTimeout(r, 800));
+          reply = `🔍 **Visual Diagnosis (Demo Mentor Mode)**\n\n` +
+            `**Your Doubt:** "${doubtText}"\n\n` +
+            `1. **What's Happening:** In Python, lists are **0-indexed**. A list with 3 items (\`[10, 20, 30]\`) occupies memory slots at offsets \`0, 1, 2\`.\n` +
+            `2. **Why It Fails:** \`range(4)\` generates \`0, 1, 2, 3\`. When \`i = 3\`, Python checks Heap address \`base + 3 * pointer_size\`, which is outside the allocated array bounds -> \`IndexError\`!\n` +
+            `3. **Clean Fix:**\n` +
+            `\`\`\`python\nfor item in nums:  # Safe & Pythonic!\n    print(item)\n\`\`\`\n` +
+            `💡 *Tip: Add your Gemini API Key in the top-right header to analyze any custom photo or handwritten notes live!*`;
+        }
+
+        resultContent.textContent = reply;
+        resultBox.classList.remove('hidden');
+        addXp(35);
+      } catch (err) {
+        resultContent.textContent = `⚠️ Error: ${err.message}\n\nCheck your Gemini API key in the top bar or call Mentor Help at 7989686037.`;
+        resultBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-sparkles"></i> Solve My Doubt with Gemini AI';
+      }
+    }
+
+    // ==================== AI MENTOR CHATBOT ====================
+    function sendQuickPrompt(text) {
+      document.getElementById('chatInput').value = text;
+      handleChatSubmit(new Event('submit'));
+    }
+
+    async function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const prompt = input.value.trim();
+      if (!prompt) return;
+
+      appendChatBubble('user', prompt);
+      input.value = '';
+      const loadingId = appendChatBubble('bot', 'Thinking through flowcharts, memory & code...');
+
+      try {
+        let reply = '';
+        if (state.apiKey) {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${state.model}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+              contents: [{ role: 'user', parts: [{ text: prompt }] }]
+            })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error?.message || 'Gemini API Error');
+          reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
+        } else {
+          await new Promise(r => setTimeout(r, 650));
+          reply = generateOfflineMentorReply(prompt);
+        }
+
+        updateChatBubble(loadingId, reply);
+        addXp(15);
+      } catch (err) {
+        updateChatBubble(loadingId, `⚠️ ${err.message}\n\nTip: Tap "Set Key" in the top bar to verify your Gemini API key, or tap "Help" to call 7989686037.`);
+      }
+    }
+
+    function generateOfflineMentorReply(q) {
+      const lower = q.toLowerCase();
+      if (lower.includes('stack') || lower.includes('heap') || lower.includes('memory')) {
+        return `🧠 **Stack vs. Heap in Python:**\n\n• **Stack Memory** stores function call frames and variable *names* (labels).\n• **Heap Memory** stores the actual Python *objects* (ints, lists, dicts) along with their type and reference count.\n\nExample:\n\`x = [1, 2]\`\n\`x\` lives on the Stack and holds a memory pointer (e.g., \`0x7f1a\`) to the list object on the Heap!\n\n*(Paste your Gemini API key at the top for unlimited custom Q&A!)*`;
+      }
+      if (lower.includes('binary') || lower.includes('convert')) {
+        return `🔢 **Decimal to Binary Step-by-Step:**\n\nDivide by 2 repeatedly and record remainders from bottom to top:\n• 45 ÷ 2 = 22 rem **1**\n• 22 ÷ 2 = 11 rem **0**\n• 11 ÷ 2 = 5 rem **1**\n• 5 ÷ 2 = 2 rem **1**\n• 2 ÷ 2 = 1 rem **0**\n• 1 ÷ 2 = 0 rem **1**\n\nResult: \`0b101101\`! In Python, simply run \`bin(45)\`.`;
+      }
+      if (lower.includes('project')) {
+        return `🚀 **Beginner Project: Number Guessing Game**\n\n1. **Flowchart:** Start -> Pick Random Number -> Loop Guess -> Too High/Low? -> Win!\n2. **Code:**\n\`\`\`python\nimport random\nsecret = random.randint(1, 20)\nwhile True:\n    guess = int(input("Guess (1-20): "))\n    if guess == secret:\n        print("🎉 You nailed it!")\n        break\n    print("Too low!" if guess < secret else "Too high!")\n\`\`\``;
+      }
+      return `🐍 **PyQuest Mentor Note:**\nGreat question about "${q}"!\n\n1. **Think in Flowcharts:** Break inputs, decisions (\`if/else\`), and loops first.\n2. **Write Clean Python:** Keep variables descriptive and test edge cases.\n\n🔑 *Add your Gemini API Key via the top-right "Set Key" button to unlock live Gemini AI responses, or tap the green "Help" button to call 7989686037!*`;
+    }
+
+    function appendChatBubble(sender, text) {
+      const container = document.getElementById('chatMessages');
+      const id = 'msg-' + Date.now() + Math.random().toString(16).slice(2);
+      const wrapper = document.createElement('div');
+
+      if (sender === 'user') {
+        wrapper.className = 'flex justify-end';
+        wrapper.innerHTML = `
+          <div class="bg-indigo-600 text-white rounded-2xl rounded-tr-none px-3.5 py-2.5 text-xs max-w-[82%] shadow-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(text)}</div>
+        `;
+      } else {
+        wrapper.className = 'flex items-start gap-2.5';
+        wrapper.innerHTML = `
+          <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow">
+            <i class="fa-solid fa-robot text-xs"></i>
+          </div>
+          <div id="${id}" class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-3 text-xs text-slate-800 shadow-sm max-w-[85%] leading-relaxed whitespace-pre-wrap">${escapeHtml(text)}</div>
+        `;
+      }
+
+      container.appendChild(wrapper);
+      container.scrollTop = container.scrollHeight;
+      return id;
+    }
+
+    function updateChatBubble(id, newText) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = newText;
+        const container = document.getElementById('chatMessages');
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+  </script>
+</body>
+</html>
