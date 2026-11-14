@@ -231,9 +231,6 @@
           <div class="flex items-center gap-1.5">
             <button onclick="scrollLessonPalette(-220)" class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center"><i class="fa-solid fa-chevron-left text-xs"></i></button>
             <button onclick="scrollLessonPalette(220)" class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></button>
-            <button onclick="openAppIconStudioModal()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1.5">
-              <i class="fa-solid fa-mobile-screen-button"></i> App Icon
-            </button>
           </div>
         </div>
         <div id="lessonPalette" class="lesson-palette-scroll gap-2 py-1"></div>
@@ -437,21 +434,11 @@
           <input type="password" id="customApiKeyInput" placeholder="Paste Gemini API Key (AIzaSy...)" class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-3.5 pr-10 py-2.5 text-xs font-mono" />
           <button type="button" onclick="toggleApiKeyVisibility()" class="absolute right-3 text-slate-400"><i id="apiKeyEyeIcon" class="fa-regular fa-eye"></i></button>
         </div>
-        <div class="p-3 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-between gap-3">
-          <div class="flex items-center gap-2.5">
-            <img id="settingsMiniAppIconPreview" src="" alt="pyB Icon" class="w-10 h-10 rounded-xl bg-slate-900 object-cover" />
-            <div>
-              <p class="text-xs font-extrabold text-slate-900">Home-Screen Shortcut Logo</p>
-              <p class="text-[11px] text-slate-600">Customize installed app icon</p>
-            </div>
-          </div>
-          <button type="button" onclick="closeApiSettingsModal(); openAppIconStudioModal();" class="px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs">Customize Logo</button>
-        </div>
-        <select id="voicePersonaSelect" onchange="saveVoicePreference()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-semibold">
+        <select id="voicePersonaSelect" onchange="saveVoicePreference()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs font-bold">
           <option value="Sulafat">Sulafat — Warm, Soft & Gentle</option>
           <option value="Aoede">Aoede — Breezy & Natural</option>
-          <option value="Achernar">Achernar — Calm & Soothing</option>
-          <option value="Leda">Leda — Friendly & Youthful</option>
+          <option value="Achernar">Achernar — Calm & Gentle</option>
+          <option value="Leda">Leda — Youthful & Friendly</option>
         </select>
         <div id="apiKeyTestFeedback" class="hidden"></div>
         <div class="flex flex-wrap items-center gap-2">
@@ -463,49 +450,33 @@
     </div>
   </div>
 
-  <!-- App Icon Studio Modal -->
-  <div id="appIconStudioModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
-      <div class="p-4 bg-indigo-950 text-white flex items-center justify-between">
-        <h3 class="font-extrabold text-base">Dynamic App Shortcut Logo</h3>
-        <button onclick="closeAppIconStudioModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+  <!-- 3-Second Funny & Uplifting AR Pop-Up Toast -->
+  <div id="funnyMoodPopup" class="fixed bottom-20 left-3 right-3 sm:left-auto sm:right-5 sm:w-80 z-50 hidden pointer-events-none">
+    <div class="bg-slate-900/95 backdrop-blur-md border-2 border-amber-400/80 rounded-3xl p-3.5 shadow-2xl text-white flex items-center gap-3">
+      <div class="relative w-20 h-20 rounded-2xl overflow-hidden shrink-0 border-2 border-cyan-400 shadow-lg bg-indigo-950">
+        <canvas id="funnyFilterCanvas" width="240" height="240" class="w-full h-full object-cover"></canvas>
       </div>
-      <div class="p-5 space-y-4">
-        <div class="bg-slate-900 rounded-2xl p-4 text-center">
-          <img id="liveAppIconPreviewImg" src="" alt="pyB App Icon" class="w-20 h-20 mx-auto rounded-[22px] shadow-2xl object-cover bg-slate-950" />
-          <span id="liveAppShortcutLabel" class="block text-xs font-bold text-white mt-2">pyB</span>
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button" onclick="setAppIconTheme('royal')" id="iconThemeBtn-royal" class="icon-theme-btn p-2.5 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-left text-xs font-extrabold">Royal Indigo & Gold</button>
-          <button type="button" onclick="setAppIconTheme('rank')" id="iconThemeBtn-rank" class="icon-theme-btn p-2.5 rounded-xl border border-slate-200 bg-white text-left text-xs font-extrabold">Auto-Sync Rank Tier</button>
-          <button type="button" onclick="setAppIconTheme('cyber')" id="iconThemeBtn-cyber" class="icon-theme-btn p-2.5 rounded-xl border border-slate-200 bg-white text-left text-xs font-extrabold">Emerald Matrix</button>
-          <button type="button" onclick="setAppIconTheme('avatar')" id="iconThemeBtn-avatar" class="icon-theme-btn p-2.5 rounded-xl border border-slate-200 bg-white text-left text-xs font-extrabold">Bhavagnya's Photo</button>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <input type="text" id="shortcutNameInput" value="pyB" maxlength="14" oninput="updateDynamicAppIcon()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold" />
-          <label for="customAppIconFileInput" class="py-2 px-3 rounded-xl bg-slate-100 border border-slate-300 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer">
-            <i class="fa-solid fa-upload"></i> Upload Image
-          </label>
-          <input type="file" id="customAppIconFileInput" accept="image/*" class="hidden" onchange="handleCustomAppIconUpload(event)" />
-        </div>
-        <div class="flex items-center gap-2">
-          <button type="button" onclick="downloadGeneratedAppIcon()" class="flex-1 py-2.5 px-4 rounded-xl bg-slate-900 text-white font-bold text-xs">Download 512px PNG</button>
-          <button type="button" onclick="closeAppIconStudioModal()" class="py-2.5 px-5 rounded-xl bg-indigo-600 text-white font-bold text-xs">Done</button>
-        </div>
+      <div class="flex-1 min-w-0">
+        <span id="funnyPopupBadge" class="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 mb-1">Genius Mode 🧠</span>
+        <p id="funnyPopupQuote" class="text-xs font-bold text-white leading-snug">What, like Python is hard? 💅</p>
+        <p id="funnyPopupSub" class="text-[11px] text-cyan-300 font-semibold mt-0.5">She's Unstoppable! 🔥</p>
       </div>
     </div>
   </div>
 
-  <!-- Rank Celebration Modal -->
-  <div id="rankCelebrationModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-amber-400/50 text-white w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl space-y-4">
-      <div id="celebrationRankTag" class="inline-block px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-extrabold uppercase">Rank Unlocked!</div>
-      <div id="celebrationFramePreview" class="w-24 h-24 mx-auto rounded-full p-1.5 avatar-frame-gold">
-        <img id="celebrationAvatarImg" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bhavagnya&backgroundColor=c0aede" alt="Bhavagnya" class="w-full h-full rounded-full object-cover border-2 border-white" />
+  <!-- Rank & Telugu Meme Achievement Celebration Modal -->
+  <div id="rankCelebrationModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-amber-400/70 text-white w-full max-w-sm rounded-3xl p-5 text-center shadow-2xl space-y-3.5">
+      <div id="celebrationRankTag" class="inline-block px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-extrabold uppercase tracking-wider">Achievement Unlocked!</div>
+      <div id="celebrationFramePreview" class="w-44 h-44 mx-auto rounded-3xl p-1.5 avatar-frame-gold overflow-hidden">
+        <canvas id="achievementMemeCanvas" width="360" height="360" class="w-full h-full rounded-2xl object-cover bg-slate-950"></canvas>
       </div>
-      <h3 id="celebrationHeading" class="text-xl font-extrabold text-white">Hyped Rank Up, Bhavagnya!</h3>
+      <div class="bg-white/10 border border-amber-400/30 rounded-2xl px-3 py-2">
+        <p id="teluguMemePunchline" class="text-sm font-extrabold text-amber-300">"Thaggedhe Le! 🔥 Mass Coding Bhavagnya!"</p>
+      </div>
+      <h3 id="celebrationHeading" class="text-lg font-extrabold text-white">Hyped Rank Up, Bhavagnya!</h3>
       <p id="celebrationSubtext" class="text-xs text-slate-300"></p>
-      <button onclick="document.getElementById('rankCelebrationModal').classList.add('hidden')" class="w-full py-3 rounded-2xl bg-amber-400 text-slate-950 font-extrabold text-sm">Awesome! Continue Learning</button>
+      <button onclick="document.getElementById('rankCelebrationModal').classList.add('hidden')" class="w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-extrabold text-sm shadow-lg">Mass! Continue Coding 🚀</button>
     </div>
   </div>
 
