@@ -672,11 +672,78 @@ let state = {
   avatarDataUrl: localStorage.getItem('pyquest_avatar_bhavagnya') || '',
   uploadedCodeImageBase64: '',
   customApiKey: localStorage.getItem('pyb_custom_gemini_key') || '',
-  voicePersona: localStorage.getItem('pyb_voice_persona') || 'Sulafat',
-  appIconTheme: localStorage.getItem('pyb_app_icon_theme') || 'royal',
-  shortcutName: localStorage.getItem('pyb_shortcut_name') || 'pyB',
-  customAppIconDataUrl: localStorage.getItem('pyb_custom_app_icon') || ''
+  voicePersona: localStorage.getItem('pyb_voice_persona') || 'Sulafat'
 };
+
+// Developer-Locked App Branding (Only editable here in source code)
+const DEVELOPER_LOCKED_BRANDING = {
+  appName: 'pyB',
+  themeColor: '#1e1b4b',
+  accentColor: '#fbbf24',
+  bracketColor: '#38bdf8'
+};
+
+// Funny & Uplifting AR Filter Presets for Random 3-Second App Click Pop-ups
+const FUNNY_MOOD_PRESETS = [
+  {
+    filterType: 'galaxy_brain',
+    badge: 'GENIUS MODE 🧠🔥',
+    quote: '"What, like Python is hard?" 💅',
+    sub: "SHE'S UNSTOPPABLE! Keep shining, Bhavagnya!"
+  },
+  {
+    filterType: 'neon_glasses',
+    badge: 'BUG SLAYER 😎⚡',
+    quote: 'Syntax errors see Bhavagnya and fix themselves!',
+    sub: 'Hello Bhavagnya! ✨ Let’s Python!'
+  },
+  {
+    filterType: 'cyber_crown',
+    badge: 'QUEEN OF CODE 👑🚀',
+    quote: 'Zero bugs, 100% swag, pure Python magic!',
+    sub: 'Superstar Developer Vibes! ✨'
+  },
+  {
+    filterType: 'telugu_swag',
+    badge: 'MASS CODER 🔥😎',
+    quote: 'Evadra Python kashtam annadhi? Bhavagnya ikkada!',
+    sub: 'Full Josh & Zero Tension! 💪'
+  },
+  {
+    filterType: 'star_eyes',
+    badge: 'BRAIN OVERCLOCKED ⚡✨',
+    quote: 'Coffee + Bhavagnya = Unstoppable Logic Engine!',
+    sub: 'You are crushing every chapter!'
+  }
+];
+
+// Telugu Meme & Mass Celebration Templates for Every Completed Achievement
+const TELUGU_MEME_CELEBRATIONS = [
+  {
+    topBanner: 'THAGGEDHE LE! 🔥',
+    bottomBanner: 'PYTHON KINGU... BHAVAGNYA QUEENU! 👑',
+    punchline: '"Thaggedhe Le! 🔥 Ee range lo code chesthe Python kuda fans ayipothundi!"',
+    filterType: 'cyber_crown'
+  },
+  {
+    topBanner: 'MIND BLOCK CODING! 🧠⚡',
+    bottomBanner: 'EVADRA AAPI CHUPINCHEDI! 😎',
+    punchline: '"Mind Block! 🤯 Okka chapter kuda vadhalatledhu ga Bhavagnya!"',
+    filterType: 'galaxy_brain'
+  },
+  {
+    topBanner: 'MASS RAMPAGE! 🚀💥',
+    bottomBanner: 'BUGS ANNI PACK UP! 💼🏃‍♂️',
+    punchline: '"Mass Rampage! 💥 Bhavagnya code chusi bugs anni paripoyayi!"',
+    filterType: 'neon_glasses'
+  },
+  {
+    topBanner: 'AARADUGULA BULLET-U! 🎯🔥',
+    bottomBanner: 'NEXT LEVEL PYTHONISTA! 🏆',
+    punchline: '"Aaradugula Bullet-u! 🎯 Speed & accuracy lo thopu nuvvu!"',
+    filterType: 'telugu_swag'
+  }
+];
 
 PYQUEST_CHAPTERS.forEach(ch => {
   state.visibleChallengesCount[ch.id] = Math.min(2, ch.challenges.length);
@@ -695,9 +762,6 @@ function processAvatarFile(file) {
       localStorage.setItem('pyquest_avatar_bhavagnya', dataUrl);
     } catch (err) {}
     updateAvatarUI();
-    if (state.appIconTheme === 'avatar' || state.appIconTheme === 'rank') {
-      updateDynamicAppIcon();
-    }
   };
   reader.readAsDataURL(file);
 }
@@ -772,9 +836,7 @@ function updateAvatarUI() {
 
   if (state.avatarDataUrl) {
     const userImg = document.getElementById('userAvatarImg');
-    const celebImg = document.getElementById('celebrationAvatarImg');
     if (userImg) userImg.src = state.avatarDataUrl;
-    if (celebImg) celebImg.src = state.avatarDataUrl;
   }
 
   const frameEl = document.getElementById('avatarOuterFrame');
@@ -816,7 +878,8 @@ function toggleChapterComplete() {
   const prevTier = getTierInfo(state.completedChapters.length).tier;
 
   const idx = state.completedChapters.indexOf(chapter.id);
-  if (idx === -1) {
+  const isNowCompleted = idx === -1;
+  if (isNowCompleted) {
     state.completedChapters.push(chapter.id);
   } else {
     state.completedChapters.splice(idx, 1);
@@ -824,23 +887,38 @@ function toggleChapterComplete() {
 
   localStorage.setItem('pyquest_completed_bhavagnya', JSON.stringify(state.completedChapters));
   updateAvatarUI();
-  updateDynamicAppIcon();
   renderChapterTabs();
   renderActiveChapter();
 
-  const newTierInfo = getTierInfo(state.completedChapters.length);
-  if (idx === -1 && newTierInfo.tier !== prevTier) {
-    triggerRankCelebration(newTierInfo);
+  if (isNowCompleted) {
+    const newTierInfo = getTierInfo(state.completedChapters.length);
+    triggerRankCelebration(newTierInfo, chapter, newTierInfo.tier !== prevTier);
   }
 }
 
-function triggerRankCelebration(tierInfo) {
+function triggerRankCelebration(tierInfo, chapter = null, upgradedRank = true) {
   const modal = document.getElementById('rankCelebrationModal');
   const preview = document.getElementById('celebrationFramePreview');
-  preview.className = `w-24 h-24 mx-auto rounded-full p-1.5 ${tierInfo.frameClass}`;
-  document.getElementById('celebrationRankTag').textContent = `${tierInfo.label} Unlocked!`;
-  document.getElementById('celebrationHeading').textContent = `Hyped Rank Up, Bhavagnya!`;
-  document.getElementById('celebrationSubtext').textContent = `You completed ${state.completedChapters.length} chapter(s) and upgraded your avatar aura to ${tierInfo.label}!`;
+  const meme = TELUGU_MEME_CELEBRATIONS[Math.floor(Math.random() * TELUGU_MEME_CELEBRATIONS.length)];
+
+  preview.className = `w-44 h-44 mx-auto rounded-3xl p-1.5 ${tierInfo.frameClass} overflow-hidden`;
+  document.getElementById('celebrationRankTag').textContent = upgradedRank
+    ? `${tierInfo.label} Unlocked! 🏆`
+    : `Chapter ${chapter ? chapter.id : ''} Mass Victory! 🔥`;
+  document.getElementById('teluguMemePunchline').textContent = meme.punchline;
+  document.getElementById('celebrationHeading').textContent = upgradedRank
+    ? `Hyped Rank Up, Bhavagnya!`
+    : `Superb Achievement, Bhavagnya!`;
+  document.getElementById('celebrationSubtext').textContent = chapter
+    ? `Completed "${chapter.title}" (${state.completedChapters.length}/${PYQUEST_CHAPTERS.length} Chapters Mastered)!`
+    : `You upgraded your avatar aura to ${tierInfo.label}!`;
+
+  renderFilteredBhavagnyaCanvas(
+    document.getElementById('achievementMemeCanvas'),
+    meme.filterType,
+    meme.topBanner,
+    meme.bottomBanner
+  );
   modal.classList.remove('hidden');
 }
 
@@ -851,53 +929,135 @@ function simulateTierDemo() {
     { label: 'Gold Master', frameClass: 'avatar-frame-gold' }
   ];
   const pick = tiers[(state.completedChapters.length) % tiers.length];
-  triggerRankCelebration(pick);
+  triggerRankCelebration(pick, PYQUEST_CHAPTERS[state.activeChapterIdx], true);
 }
 
 // =============================================================================
-// CHAPTER TABS, MOBILE LESSON PALETTE, CHALLENGES & INTERVIEW RENDERERS
+// AR FUNNY & TELUGU MEME FILTER RENDERER + 3-SECOND RANDOM CLICK POP-UP
 // =============================================================================
-function renderChapterTabs() {
-  const container = document.getElementById('chapterTabsContainer');
-  if (!container) return;
-  container.innerHTML = PYQUEST_CHAPTERS.map((ch, idx) => {
-    const isActive = idx === state.activeChapterIdx;
-    const isDone = state.completedChapters.includes(ch.id);
-    return `
-      <button onclick="selectChapter(${idx})"
-              class="lesson-pill px-4 py-2.5 rounded-2xl border text-left transition-all flex items-center gap-2.5 ${
-                isActive
-                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200'
-                  : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40'
-              }">
-        <span class="w-6 h-6 rounded-lg text-xs font-extrabold flex items-center justify-center ${
-          isDone
-            ? 'bg-emerald-500 text-white'
-            : isActive
-              ? 'bg-white/20 text-white'
-              : 'bg-slate-100 text-slate-700'
-        }">
-          ${isDone ? '<i class="fa-solid fa-check"></i>' : ch.id}
-        </span>
-        <div>
-          <div class="text-xs font-extrabold whitespace-nowrap">Ch ${ch.id}: ${ch.title}</div>
-          <div class="text-[10px] ${isActive ? 'text-indigo-100' : 'text-slate-400'}">${ch.lessons.length} Lessons • ${ch.interviewQuestions.length} Interview Qs</div>
-        </div>
-      </button>
-    `;
-  }).join('');
+let funnyPopupHideTimer = null;
+let funnyPopupRemoveTimer = null;
+let lastPopupTimestamp = 0;
+
+function renderFilteredBhavagnyaCanvas(canvas, filterType, topMemeText = '', bottomMemeText = '') {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  const imgEl = document.getElementById('userAvatarImg');
+
+  const drawOverlays = () => {
+    // Vibrant gradient tint
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, 'rgba(99, 102, 241, 0.16)');
+    grad.addColorStop(1, 'rgba(245, 158, 11, 0.22)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.textAlign = 'center';
+    if (filterType === 'galaxy_brain') {
+      ctx.font = `${Math.round(w * 0.22)}px serif`;
+      ctx.fillText('🧠✨', w * 0.5, h * 0.24);
+      ctx.font = `${Math.round(w * 0.18)}px serif`;
+      ctx.fillText('⭐🕶️⭐', w * 0.5, h * 0.54);
+    } else if (filterType === 'neon_glasses') {
+      ctx.font = `${Math.round(w * 0.24)}px serif`;
+      ctx.fillText('🕶️⚡', w * 0.5, h * 0.52);
+      ctx.font = `${Math.round(w * 0.15)}px serif`;
+      ctx.fillText('✨💻✨', w * 0.5, h * 0.22);
+    } else if (filterType === 'cyber_crown') {
+      ctx.font = `${Math.round(w * 0.24)}px serif`;
+      ctx.fillText('👑🔥', w * 0.5, h * 0.24);
+      ctx.font = `${Math.round(w * 0.18)}px serif`;
+      ctx.fillText('🤩', w * 0.82, h * 0.82);
+    } else if (filterType === 'telugu_swag') {
+      ctx.font = `${Math.round(w * 0.23)}px serif`;
+      ctx.fillText('😎🔥', w * 0.5, h * 0.52);
+      ctx.font = `${Math.round(w * 0.16)}px serif`;
+      ctx.fillText('🚀💥', w * 0.5, h * 0.23);
+    } else {
+      ctx.font = `${Math.round(w * 0.22)}px serif`;
+      ctx.fillText('🤩✨', w * 0.5, h * 0.52);
+    }
+
+    // Telugu / Meme Top & Bottom Banners (for achievement celebrations)
+    if (topMemeText) {
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.fillRect(0, 0, w, h * 0.16);
+      ctx.font = `900 ${Math.round(w * 0.068)}px "Plus Jakarta Sans", sans-serif`;
+      ctx.fillStyle = '#fde047';
+      ctx.fillText(topMemeText, w * 0.5, h * 0.11);
+    }
+    if (bottomMemeText) {
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+      ctx.fillRect(0, h * 0.83, w, h * 0.17);
+      ctx.font = `800 ${Math.round(w * 0.052)}px "Plus Jakarta Sans", sans-serif`;
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText(bottomMemeText, w * 0.5, h * 0.935);
+    }
+  };
+
+  ctx.clearRect(0, 0, w, h);
+  if (imgEl && imgEl.complete && imgEl.naturalWidth > 0) {
+    try {
+      ctx.drawImage(imgEl, 0, 0, w, h);
+      drawOverlays();
+      return;
+    } catch (e) {}
+  }
+
+  // Fallback stylized portrait background if image hasn't loaded yet
+  const bg = ctx.createLinearGradient(0, 0, w, h);
+  bg.addColorStop(0, '#312e81');
+  bg.addColorStop(1, '#1e1b4b');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, w, h);
+  ctx.font = `900 ${Math.round(w * 0.32)}px "Plus Jakarta Sans", sans-serif`;
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.fillText('B', w * 0.5, h * 0.62);
+  drawOverlays();
 }
 
-function selectChapter(idx) {
-  state.activeChapterIdx = idx;
-  state.activeLessonIdx = 0;
-  renderChapterTabs();
-  renderActiveChapter();
+function showRandomFunnyMoodPopup(force = false) {
+  const now = Date.now();
+  // Trigger randomly on app clicks (with a brief 4.5s cooldown so rapid double-clicks don't stack)
+  if (!force && (now - lastPopupTimestamp < 4500 || Math.random() > 0.65)) {
+    return;
+  }
+  lastPopupTimestamp = now;
+
+  const popup = document.getElementById('funnyMoodPopup');
+  if (!popup) return;
+
+  const preset = FUNNY_MOOD_PRESETS[Math.floor(Math.random() * FUNNY_MOOD_PRESETS.length)];
+  document.getElementById('funnyPopupBadge').textContent = preset.badge;
+  document.getElementById('funnyPopupQuote').textContent = preset.quote;
+  document.getElementById('funnyPopupSub').textContent = preset.sub;
+
+  renderFilteredBhavagnyaCanvas(document.getElementById('funnyFilterCanvas'), preset.filterType);
+
+  clearTimeout(funnyPopupHideTimer);
+  clearTimeout(funnyPopupRemoveTimer);
+
+  popup.classList.remove('hidden', 'funny-popup-exit');
+  popup.classList.add('funny-popup-enter');
+
+  // Auto-disappear smoothly after exactly 3 seconds
+  funnyPopupHideTimer = setTimeout(() => {
+    popup.classList.remove('funny-popup-enter');
+    popup.classList.add('funny-popup-exit');
+    funnyPopupRemoveTimer = setTimeout(() => {
+      popup.classList.add('hidden');
+    }, 350);
+  }, 3000);
 }
 
-function scrollLessonPalette(delta) {
-  const palette = document.getElementById('lessonPalette');
-  if (palette) palette.scrollBy({ left: delta, behavior: 'smooth' });
+// Trigger random uplifting pop-up on interactive clicks anywhere in the app
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#rankCelebrationModal') || e.target.closest('#apiSettingsModal')) return;
+  showRandomFunnyMoodPopup(false);
+});
 }
 
 function selectLesson(lessonIdx) {
@@ -1951,9 +2111,88 @@ function downloadGeneratedAppIcon() {
 // =============================================================================
 // INITIALIZE APP ON LOAD
 // =============================================================================
+// DEVELOPER-CONTROLLED APP ICON & MANIFEST (LOCKED FROM END-USER OVERRIDE)
+// =============================================================================
+let activeManifestBlobUrl = null;
+
+function applyDeveloperLockedAppIcon() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  // Rounded Royal Indigo & Gold Developer Emblem
+  ctx.beginPath();
+  ctx.roundRect(0, 0, 512, 512, 112);
+  ctx.closePath();
+  const bgGrad = ctx.createLinearGradient(0, 0, 512, 512);
+  bgGrad.addColorStop(0, '#0f172a');
+  bgGrad.addColorStop(1, '#312e81');
+  ctx.fillStyle = bgGrad;
+  ctx.fill();
+
+  ctx.strokeStyle = DEVELOPER_LOCKED_BRANDING.bracketColor;
+  ctx.lineWidth = 18;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(92, 175);
+  ctx.lineTo(54, 256);
+  ctx.lineTo(92, 337);
+  ctx.stroke();
+
+  ctx.strokeStyle = DEVELOPER_LOCKED_BRANDING.accentColor;
+  ctx.beginPath();
+  ctx.moveTo(420, 175);
+  ctx.lineTo(458, 256);
+  ctx.lineTo(420, 337);
+  ctx.stroke();
+
+  ctx.font = '800 158px "Plus Jakarta Sans", Inter, sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'right';
+  ctx.fillText('py', 284, 308);
+
+  ctx.font = '900 176px "Plus Jakarta Sans", Inter, sans-serif';
+  ctx.fillStyle = DEVELOPER_LOCKED_BRANDING.accentColor;
+  ctx.textAlign = 'left';
+  ctx.fillText('B', 288, 312);
+
+  const iconDataUrl = canvas.toDataURL('image/png');
+  const fav = document.getElementById('dynamicFaviconLink');
+  const apple = document.getElementById('dynamicAppleTouchIconLink');
+  if (fav) fav.href = iconDataUrl;
+  if (apple) apple.href = iconDataUrl;
+
+  const manifestObj = {
+    name: `${DEVELOPER_LOCKED_BRANDING.appName} — Bhavagnya's Python Studio`,
+    short_name: DEVELOPER_LOCKED_BRANDING.appName,
+    description: "Interactive Python Mastery with Natural Gemini Voice & Rank Frames",
+    start_url: window.location.href,
+    display: "standalone",
+    background_color: DEVELOPER_LOCKED_BRANDING.themeColor,
+    theme_color: DEVELOPER_LOCKED_BRANDING.themeColor,
+    icons: [
+      { src: iconDataUrl, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+      { src: iconDataUrl, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+    ]
+  };
+
+  if (activeManifestBlobUrl) URL.revokeObjectURL(activeManifestBlobUrl);
+  activeManifestBlobUrl = URL.createObjectURL(
+    new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' })
+  );
+  const manifestLink = document.getElementById('dynamicManifestLink');
+  if (manifestLink) manifestLink.href = activeManifestBlobUrl;
+}
+
+// =============================================================================
+// INITIALIZE APP ON LOAD
+// =============================================================================
 window.addEventListener('DOMContentLoaded', () => {
   updateAvatarUI();
-  updateDynamicAppIcon();
+  applyDeveloperLockedAppIcon();
   renderChapterTabs();
   renderActiveChapter();
+  // Greet Bhavagnya immediately on app launch for 3 seconds
+  setTimeout(() => showRandomFunnyMoodPopup(true), 450);
 });
