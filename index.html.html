@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1e1b4b" id="manifestThemeColorMeta" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="pyB" />
+
+  <!-- Developer-Controlled Manifest & Icons (Synchronized from manifest.json) -->
+  <link rel="manifest" href="./manifest.json" />
+  <link id="manifestFaviconLink" rel="icon" type="image/png" href="" />
+  <link id="manifestAppleTouchIconLink" rel="apple-touch-icon" href="" />
+  <title>pyB — Bhavagnya's Mobile Python Studio</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS & Font Awesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="./styles.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Inter"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="antialiased selection:bg-indigo-100 selection:text-indigo-900">
+
+  <!-- STICKY MOBILE-FIRST HEADER -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm pt-[env(safe-area-inset-top)]">
+    <div class="max-w-5xl mx-auto px-3 sm:px-6 py-2 flex items-center justify-between gap-2">
+      <!-- Top-Left pyB Brand Logo (Developer-Locked Icon; Tap for API Key & Soft Voice) -->
+      <button onclick="openApiSettingsModal()" title="Tap to Configure Gemini API Key & Natural Voice"
+              class="min-h-[44px] flex items-center gap-2 text-left group rounded-2xl p-1 -ml-1 active:scale-95 transition">
+        <div class="relative h-10 px-2.5 rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-900 to-violet-800 flex items-center justify-center shadow-md border border-indigo-400/30">
+          <svg viewBox="0 0 88 38" class="h-6 w-auto" aria-label="pyB App Logo">
+            <defs>
+              <linearGradient id="pybGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fde047"/>
+                <stop offset="50%" stop-color="#f59e0b"/>
+                <stop offset="100%" stop-color="#fbbf24"/>
+              </linearGradient>
+              <linearGradient id="pybCyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#38bdf8"/>
+                <stop offset="100%" stop-color="#a5b4fc"/>
+              </linearGradient>
+            </defs>
+            <path d="M10 8 L4 19 L10 30" fill="none" stroke="url(#pybCyanGrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M78 8 L84 19 L78 30" fill="none" stroke="url(#pybGoldGrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="15" y="26" font-family="Plus Jakarta Sans, Inter, sans-serif" font-weight="800" font-size="22" fill="#ffffff">py</text>
+            <text x="43" y="27" font-family="Plus Jakarta Sans, Inter, sans-serif" font-weight="900" font-size="25" fill="url(#pybGoldGrad)">B</text>
+            <circle cx="70" cy="11" r="2.6" fill="#38bdf8"/>
+          </svg>
+          <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white"></span>
+        </div>
+        <div>
+          <div class="flex items-center gap-1">
+            <span class="font-extrabold text-base sm:text-lg tracking-tight text-slate-900">pyB</span>
+            <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">
+              <i class="fa-solid fa-key text-[8px]"></i>
+            </span>
+          </div>
+          <p class="text-[10px] text-slate-500 leading-tight">Bhavagnya's Studio</p>
+        </div>
+      </button>
+
+      <!-- Desktop Progress Bar -->
+      <div class="hidden md:flex items-center gap-3 bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-2xl">
+        <div class="text-xs font-semibold text-slate-600">
+          Chapters: <span id="headerCompletedCount" class="text-indigo-600 font-bold">0</span>/<span id="headerTotalChapters">6</span>
+        </div>
+        <div class="w-28 h-2 bg-slate-200 rounded-full overflow-hidden">
+          <div id="headerProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-amber-500 transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Bhavagnya Profile Photo & Tiered Frame (Drives Pop-ups & Telugu Meme Cards) -->
+      <div class="flex items-center gap-2">
+        <div class="text-right">
+          <div class="flex items-center justify-end gap-1">
+            <span class="font-extrabold text-xs sm:text-sm text-slate-900">Bhavagnya</span>
+            <span id="tierCrownIcon" class="hidden text-amber-500 text-xs"><i class="fa-solid fa-crown"></i></span>
+          </div>
+          <span id="tierBadge" class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+            <i class="fa-solid fa-rocket text-[9px]"></i> Starter
+          </span>
+        </div>
+
+        <div id="avatarDropZone"
+             ondragover="handleAvatarDragOver(event)"
+             ondragleave="handleAvatarDragLeave(event)"
+             ondrop="handleAvatarDrop(event)"
+             class="relative group rounded-full cursor-pointer">
+          <div id="goldSparkles" class="hidden pointer-events-none">
+            <span class="sparkle-particle absolute -top-2 -left-1 text-amber-400 text-xs">✦</span>
+            <span class="sparkle-particle absolute -top-1 -right-2 text-yellow-500 text-sm">★</span>
+          </div>
+          <div id="avatarOuterFrame" class="avatar-frame-starter p-[3px] rounded-full transition-all duration-500">
+            <label for="avatarUploadInput" title="Tap to Upload Bhavagnya's Photo"
+                   class="block relative w-11 h-11 rounded-full overflow-hidden bg-slate-900 border-2 border-white cursor-pointer">
+              <img id="userAvatarImg"
+                   src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bhavagnya&backgroundColor=c0aede"
+                   alt="Bhavagnya"
+                   class="w-full h-full object-cover" />
+              <span class="absolute bottom-0 inset-x-0 bg-slate-950/70 text-white text-[9px] text-center py-0.5 font-bold">
+                <i class="fa-solid fa-camera"></i>
+              </span>
+            </label>
+          </div>
+          <input type="file" id="avatarUploadInput" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Touch Action Strip -->
+    <div class="md:hidden bg-slate-50 border-t border-slate-200/80 px-3 py-1.5 flex items-center justify-between gap-2 text-xs">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-700">Rank: <strong id="mobileCompletedCount" class="text-indigo-600">0/6</strong></span>
+        <div class="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+          <div id="mobileProgressBar" class="h-full bg-indigo-600 transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <button onclick="showRandomFunnyMoodPopup(true)" class="min-h-[34px] px-2.5 py-1 rounded-xl bg-amber-100 text-amber-900 border border-amber-300 font-extrabold active:scale-95">
+          ✨ Vibe
+        </button>
+        <a href="tel:+917989686037" class="min-h-[34px] px-2.5 py-1 rounded-xl bg-sky-50 text-sky-700 border border-sky-200 font-bold flex items-center gap-1 active:scale-95">
+          <i class="fa-solid fa-phone text-[10px]"></i>Call
+        </a>
+        <button onclick="toggleVoiceTutorModal(true)" class="min-h-[34px] px-2.5 py-1 rounded-xl bg-indigo-600 text-white font-bold flex items-center gap-1 active:scale-95">
+          <i class="fa-solid fa-microphone text-[10px]"></i>AI
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN MOBILE-OPTIMIZED CONTAINER -->
+  <main class="max-w-5xl mx-auto px-3 sm:px-6 pt-4 space-y-5">
+
+    <!-- Compact Mobile Hero Banner -->
+    <section class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-4 sm:p-6 text-white shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/10 text-[11px] font-bold text-amber-300">
+            <i class="fa-solid fa-sparkles"></i> pyB Mobile Studio
+          </span>
+          <label for="avatarUploadInput" class="text-[11px] font-bold text-sky-300 underline cursor-pointer">
+            Set Profile Photo
+          </label>
+        </div>
+        <h1 class="text-lg sm:text-2xl font-extrabold leading-tight">
+          Hey <span class="text-amber-300">Bhavagnya!</span> Ready to crush Python?
+        </h1>
+        <p class="text-xs text-slate-300">
+          Tap your profile photo anytime — every click brings fun vibes & Telugu meme celebrations!
+        </p>
+      </div>
+      <div class="grid grid-cols-3 gap-1.5 text-center shrink-0">
+        <div id="milestoneBronze" class="rounded-xl bg-white/5 border border-amber-500/40 px-2.5 py-1.5">
+          <div class="text-[11px] font-extrabold text-amber-300">Bronze (1)</div>
+        </div>
+        <div id="milestoneSilver" class="rounded-xl bg-white/5 border border-slate-400/40 px-2.5 py-1.5">
+          <div class="text-[11px] font-extrabold text-slate-200">Silver (3)</div>
+        </div>
+        <div id="milestoneGold" class="rounded-xl bg-white/5 border border-yellow-400/50 px-2.5 py-1.5">
+          <div class="text-[11px] font-extrabold text-yellow-300">Gold (5+)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Horizontal Swipeable Chapter Tabs -->
+    <section aria-label="Python Chapters">
+      <div id="chapterTabsContainer" class="lesson-palette-scroll gap-2 pb-1"></div>
+    </section>
+
+    <!-- Active Chapter Workspace -->
+    <section class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-4 sm:p-6 border-b border-slate-100 bg-slate-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span id="activeChapterBadge" class="text-xs font-extrabold px-2.5 py-0.5 rounded-lg bg-indigo-600 text-white">Chapter 1</span>
+            <span id="chapterStatusTag" class="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-slate-200 text-slate-700">In Progress</span>
+          </div>
+          <h2 id="activeChapterTitle" class="text-lg sm:text-xl font-extrabold text-slate-900"></h2>
+          <p id="activeChapterSubtitle" class="text-xs sm:text-sm text-slate-600"></p>
+        </div>
+        <button id="completeChapterBtn" onclick="toggleChapterComplete()"
+                class="w-full sm:w-auto min-h-[48px] px-5 py-3 rounded-2xl font-extrabold text-sm bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md active:scale-[0.98] transition">
+        </button>
+      </div>
+
+      <!-- Mobile Swipeable Lesson Palette with Large Touch Arrows -->
+      <div class="bg-slate-50 border-b border-slate-200 px-3 sm:px-6 py-2.5">
+        <div class="flex items-center justify-between mb-2">
+          <span id="lessonCounterPill" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700">Lesson 1</span>
+          <div class="flex items-center gap-2">
+            <button onclick="scrollLessonPalette(-220)" aria-label="Scroll Lessons Left"
+                    class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center active:bg-slate-100">
+              <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+            <button onclick="scrollLessonPalette(220)" aria-label="Scroll Lessons Right"
+                    class="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center active:bg-slate-100">
+              <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+          </div>
+        </div>
+        <div id="lessonPalette" class="lesson-palette-scroll gap-2 py-1"></div>
+      </div>
+
+      <!-- Mobile Touch Subtabs -->
+      <div class="grid grid-cols-3 border-b border-slate-200 bg-white">
+        <button onclick="switchSubTab('theory')" id="tabBtn-theory"
+                class="min-h-[46px] px-2 py-2.5 text-xs sm:text-sm font-extrabold border-b-2 border-indigo-600 text-indigo-600 text-center">
+          Visual Theory
+        </button>
+        <button onclick="switchSubTab('practice')" id="tabBtn-practice"
+                class="min-h-[46px] px-2 py-2.5 text-xs sm:text-sm font-extrabold border-b-2 border-transparent text-slate-500 text-center">
+          Challenges
+        </button>
+        <button onclick="switchSubTab('interview')" id="tabBtn-interview"
+                class="min-h-[46px] px-2 py-2.5 text-xs sm:text-sm font-extrabold border-b-2 border-transparent text-slate-500 text-center">
+          Interview Qs <span id="interviewCountBadge" class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">4</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: VISUAL THEORY -->
+      <div id="subTab-theory" class="p-4 sm:p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span id="lessonTag" class="text-[11px] font-extrabold text-indigo-600 uppercase"></span>
+            <h3 id="lessonTitle" class="text-lg sm:text-xl font-extrabold text-slate-900"></h3>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="readLessonAloud()" class="min-h-[42px] px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 border border-slate-200 active:scale-95">
+              <i class="fa-solid fa-volume-high mr-1 text-indigo-600"></i>Listen
+            </button>
+            <button onclick="askLessonDoubt()" class="min-h-[42px] px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 active:scale-95">
+              <i class="fa-solid fa-microphone mr-1"></i>Ask AI
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 rounded-2xl p-3.5 sm:p-4 text-white">
+          <span id="diagramCaptionBadge" class="inline-block text-[11px] bg-white/10 px-2.5 py-0.5 rounded-full text-indigo-200 mb-2"></span>
+          <div id="lessonVisualDiagram" class="w-full flex justify-center py-1 overflow-x-auto"></div>
+        </div>
+
+        <div id="lessonTheoryContent" class="theory-prose max-w-3xl"></div>
+
+        <div class="relative">
+          <button onclick="copyExampleCode()" class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-white/10 text-slate-200 text-[11px] font-bold">
+            <i class="fa-regular fa-copy mr-1"></i>Copy
+          </button>
+          <pre id="lessonCodeBlock" class="p-4 rounded-2xl bg-slate-950 text-emerald-300 font-mono text-xs sm:text-sm overflow-x-auto leading-relaxed"></pre>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-100">
+          <button id="prevLessonBtn" onclick="navigateLesson(-1)" class="min-h-[44px] px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-700">
+            <i class="fa-solid fa-arrow-left mr-1"></i>Previous
+          </button>
+          <button id="nextLessonBtn" onclick="navigateLesson(1)" class="min-h-[44px] px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 text-white">
+            Next Lesson<i class="fa-solid fa-arrow-right ml-1"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 2: CODING CHALLENGES -->
+      <div id="subTab-practice" class="hidden p-4 sm:p-6 space-y-4">
+        <div class="flex justify-between items-center">
+          <h3 class="text-base sm:text-lg font-extrabold">Hands-On Challenges</h3>
+          <span id="challengeCounterBadge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700"></span>
+        </div>
+        <div id="challengesContainer" class="space-y-4"></div>
+        <div class="text-center pt-2">
+          <button id="loadMoreChallengesBtn" onclick="loadMoreChallenges()" class="w-full sm:w-auto min-h-[46px] px-6 py-3 rounded-2xl font-extrabold text-sm bg-amber-500 text-white shadow">
+            <span id="loadMoreBtnText">Load More Challenges</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 3: INTERVIEW QUESTIONS -->
+      <div id="subTab-interview" class="hidden p-4 sm:p-6 space-y-4">
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex flex-wrap justify-between items-center gap-2">
+          <h3 class="font-extrabold text-sm sm:text-base text-slate-900">Interview Qs — <span id="interviewChapterName" class="text-indigo-700"></span></h3>
+          <span class="text-xs font-bold bg-amber-200 px-3 py-1 rounded-xl">Mastered: <span id="interviewMasteredCount">0</span>/<span id="interviewTotalCount">0</span></span>
+        </div>
+        <div id="interviewQuestionsList" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- Mentor Helpdesk -->
+    <section class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div>
+        <span class="text-[11px] font-extrabold uppercase text-emerald-600">Mentor Helpdesk</span>
+        <h3 class="text-base sm:text-lg font-extrabold text-slate-900">Call or WhatsApp +91 7989686037</h3>
+      </div>
+      <div class="grid grid-cols-3 sm:flex gap-2 w-full sm:w-auto">
+        <a href="tel:+917989686037" class="min-h-[44px] px-3 py-2.5 rounded-xl bg-sky-600 text-white font-bold text-xs flex items-center justify-center gap-1">
+          <i class="fa-solid fa-phone"></i><span>Call</span>
+        </a>
+        <a href="https://wa.me/917989686037" target="_blank" rel="noopener noreferrer" class="min-h-[44px] px-3 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1">
+          <i class="fa-brands fa-whatsapp"></i><span>WhatsApp</span>
+        </a>
+        <button onclick="openContactModal()" class="min-h-[44px] px-3 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center gap-1">
+          <i class="fa-solid fa-paper-plane"></i><span>Form</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- MOBILE FLOATING ACTION DOCK -->
+  <div class="fixed bottom-[calc(0.9rem+env(safe-area-inset-bottom))] right-3 sm:right-6 z-40 flex items-center gap-2">
+    <button onclick="openImageOverlayModal()" aria-label="Scan Code Screenshot"
+            class="w-12 h-12 rounded-2xl bg-slate-900 text-amber-400 shadow-xl border border-slate-700 flex items-center justify-center active:scale-95">
+      <i class="fa-solid fa-camera-retro text-lg"></i>
+    </button>
+    <button onclick="toggleVoiceTutorModal(true)"
+            class="min-h-[48px] px-4 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-extrabold text-xs sm:text-sm shadow-xl flex items-center gap-2 active:scale-95">
+      <i class="fa-solid fa-microphone-lines"></i>
+      <span>pyB Voice AI</span>
+    </button>
+  </div>
+
+  <!-- 3-SECOND RANDOM FUNNY & UPLIFTING AR POP-UP (USES PROFILE PHOTO) -->
+  <div id="funnyMoodPopup"
+       class="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] left-3 right-3 sm:left-auto sm:right-6 sm:w-80 z-50 hidden pointer-events-none">
+    <div class="bg-slate-900/95 backdrop-blur-md border-2 border-amber-400 rounded-3xl p-3 shadow-2xl flex items-center gap-3 text-white">
+      <div class="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-amber-300 shrink-0 bg-indigo-950">
+        <canvas id="funnyFilterCanvas" width="160" height="160" class="w-full h-full object-cover"></canvas>
+      </div>
+      <div class="min-w-0 flex-1">
+        <span id="funnyPopupBadge" class="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 mb-1">
+          GENIUS MODE 🧠🔥
+        </span>
+        <p id="funnyPopupQuote" class="text-xs font-extrabold text-white leading-snug">
+          "What, like Python is hard?" 💅
+        </p>
+        <p id="funnyPopupSub" class="text-[11px] text-amber-200 font-semibold mt-0.5 truncate">
+          Keep shining, Bhavagnya! ✨
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELUGU MEME & MASS ACHIEVEMENT CELEBRATION MODAL (USES PROFILE PHOTO) -->
+  <div id="rankCelebrationModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 border-2 border-amber-400 text-white w-full max-w-sm rounded-3xl p-5 text-center space-y-3.5 shadow-2xl max-h-[92vh] overflow-y-auto">
+      <div id="celebrationRankTag" class="inline-block px-3.5 py-1 rounded-full bg-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider">
+        THAGGEDHE LE! 🔥
+      </div>
+
+      <div id="celebrationFramePreview" class="w-44 h-44 mx-auto rounded-3xl p-1.5 avatar-frame-gold overflow-hidden shadow-xl">
+        <canvas id="achievementMemeCanvas" width="360" height="360" class="w-full h-full rounded-2xl object-cover bg-slate-950"></canvas>
+      </div>
+
+      <p id="teluguMemePunchline" class="text-sm font-extrabold text-amber-300 leading-snug px-2">
+        "Thaggedhe Le! 🔥 Ee range lo code chesthe Python kuda fans ayipothundi!"
+      </p>
+
+      <h3 id="celebrationHeading" class="text-lg font-extrabold">Mass Achievement, Bhavagnya!</h3>
+      <p id="celebrationSubtext" class="text-xs text-slate-300 leading-relaxed"></p>
+
+      <button onclick="document.getElementById('rankCelebrationModal').classList.add('hidden')"
+              class="w-full min-h-[48px] py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-extrabold text-sm shadow-lg active:scale-95">
+        Next Quest-ki Veldaam! 🚀
+      </button>
+    </div>
+  </div>
+
+  <!-- VOICE AI TUTOR MODAL (MOBILE BOTTOM SHEET) -->
+  <div id="voiceTutorModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl overflow-hidden flex flex-col max-h-[88vh]">
+      <div class="bg-indigo-950 p-4 text-white flex justify-between items-center">
+        <div>
+          <h3 class="font-extrabold text-base">pyB Live Voice AI</h3>
+          <p class="text-[11px] text-indigo-200">Ask Bhavagnya's Python doubts by voice or text</p>
+        </div>
+        <button onclick="toggleVoiceTutorModal(false)" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="bg-indigo-50 px-4 py-2 flex justify-between items-center text-xs">
+        <span class="font-bold text-indigo-900">Soft Human Voice</span>
+        <div class="flex items-center gap-2">
+          <button id="stopSpeakingBtn" onclick="stopAllAiAudio()" class="hidden px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 font-bold">Stop Audio</button>
+          <input type="checkbox" id="autoSpeakToggle" checked class="w-4 h-4 accent-indigo-600" />
+        </div>
+      </div>
+      <div id="aiChatMessages" class="p-4 space-y-3 overflow-y-auto flex-1 bg-slate-50 min-h-[200px]">
+        <div class="bg-white border border-slate-200 rounded-2xl p-3 text-xs sm:text-sm text-slate-800">
+          Namaskaram Bhavagnya! 👋 Tap the red mic button to ask any Python doubt, or type below.
+        </div>
+      </div>
+      <div id="voiceStatusBanner" class="hidden px-4 py-2 bg-rose-50 text-xs font-bold text-rose-700 flex justify-between items-center">
+        <span id="voiceLiveTranscript">Listening...</span>
+        <button onclick="stopVoiceRecognition()" class="underline">Stop</button>
+      </div>
+      <div class="p-3 bg-white border-t flex gap-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+        <button id="micTriggerBtn" onclick="toggleVoiceRecognition()" class="w-12 h-12 rounded-2xl bg-rose-500 text-white flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-microphone text-lg"></i>
+        </button>
+        <input id="aiTextInput" type="text" placeholder="Ask Python doubt..." onkeydown="if(event.key==='Enter') sendAiDoubt()"
+               class="flex-1 bg-slate-100 rounded-2xl px-3.5 text-base sm:text-sm" />
+        <button onclick="sendAiDoubt()" class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMAGE CODE SCANNER MODAL -->
+  <div id="imageOverlayModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden">
+      <div class="p-4 bg-slate-900 text-white flex justify-between items-center">
+        <h3 class="font-extrabold">Scan Code Image</h3>
+        <button onclick="closeImageOverlayModal()" class="w-9 h-9 rounded-full bg-white/10"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-5 space-y-4">
+        <label id="codeImageDropZone" for="codeScreenshotInput"
+               ondragover="handleCodeDropZoneDragOver(event)"
+               ondragleave="handleCodeDropZoneDragLeave(event)"
+               ondrop="handleCodeDropZoneDrop(event)"
+               class="block border-2 border-dashed border-indigo-300 rounded-2xl p-6 text-center cursor-pointer bg-indigo-50/30">
+          <i class="fa-solid fa-camera text-2xl text-indigo-600 mb-2"></i>
+          <p class="text-sm font-bold text-slate-900">Tap to Take Photo / Upload Screenshot</p>
+          <input type="file" id="codeScreenshotInput" accept="image/*" class="hidden" onchange="handleCodeImageUpload(event)" />
+        </label>
+        <div id="codeImagePreviewWrap" class="hidden space-y-3">
+          <img id="codeImagePreview" src="" alt="Preview" class="w-full max-h-44 object-contain rounded-xl bg-slate-950" />
+          <input id="codeImagePrompt" type="text" value="Explain and debug this Python code for Bhavagnya." class="w-full bg-slate-100 rounded-xl px-3 py-2.5 text-sm" />
+          <button onclick="analyzeUploadedCodeImage()" id="analyzeImgBtn" class="w-full min-h-[44px] py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm">
+            Analyze with Gemini Vision
+          </button>
+        </div>
+        <div id="codeImageResult" class="hidden bg-slate-50 border p-3 rounded-xl text-xs max-h-44 overflow-y-auto leading-relaxed"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOOGLE FORMS DOUBT MODAL -->
+  <div id="contactSupportModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden">
+      <div class="p-4 bg-slate-900 text-white flex justify-between items-center">
+        <h3 class="font-extrabold">Send Doubt to Mentor</h3>
+        <button onclick="closeContactModal()" class="w-9 h-9 rounded-full bg-white/10"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="submitGoogleSupportForm(event)" class="p-5 space-y-3">
+        <input type="text" id="formStudentName" value="Bhavagnya" required class="w-full bg-slate-50 border rounded-xl px-3 py-2.5 text-sm font-bold" />
+        <input type="text" id="formTopic" placeholder="Chapter / Topic" required class="w-full bg-slate-50 border rounded-xl px-3 py-2.5 text-sm" />
+        <textarea id="formMessage" rows="3" placeholder="Your question..." required class="w-full bg-slate-50 border rounded-xl px-3 py-2.5 text-sm"></textarea>
+        <div id="formSubmitStatus" class="hidden"></div>
+        <button type="submit" id="formSubmitBtn" class="w-full min-h-[46px] py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm">Submit Doubt</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DEVELOPER-LOCKED API KEY & NATURAL VOICE SETTINGS MODAL -->
+  <div id="apiSettingsModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden">
+      <div class="p-4 bg-slate-900 text-white flex justify-between items-center">
+        <div>
+          <h3 class="font-extrabold text-base">pyB API & Soft Voice Settings</h3>
+          <p class="text-[11px] text-slate-400">App Logo is controlled by Developer in manifest.json</p>
+        </div>
+        <button onclick="closeApiSettingsModal()" class="w-9 h-9 rounded-full bg-white/10"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Gemini API Key</label>
+          <input type="password" id="customApiKeyInput" placeholder="Paste Gemini API Key (AIzaSy...)" class="w-full bg-slate-50 border rounded-xl px-3 py-2.5 text-sm font-mono" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Human Voice Persona</label>
+          <select id="voicePersonaSelect" onchange="saveVoicePreference()" class="w-full bg-slate-50 border rounded-xl px-3 py-2.5 text-sm font-bold">
+            <option value="Sulafat">Sulafat — Warm & Soft</option>
+            <option value="Aoede">Aoede — Breezy & Natural</option>
+            <option value="Achernar">Achernar — Calm & Gentle</option>
+            <option value="Leda">Leda — Youthful & Friendly</option>
+          </select>
+        </div>
+        <div id="apiKeyTestFeedback" class="hidden"></div>
+        <button onclick="saveCustomApiKey()" class="w-full min-h-[46px] py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm">
+          Save API & Voice Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
